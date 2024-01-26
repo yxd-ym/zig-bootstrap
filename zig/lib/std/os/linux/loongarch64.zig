@@ -12,7 +12,114 @@ const stack_t = linux.stack_t;
 const sigset_t = linux.sigset_t;
 const timespec = std.os.linux.timespec;
 
-// TODO
+pub fn syscall0(number: SYS) usize {
+    return asm volatile ("syscall 0\n\t"
+        : [ret] "=$a0" (-> usize),
+        : [number] "$a7" (@intFromEnum(number)),
+        : "$t0", "$t1", "$t2", "$t3", "$t4", "$t5", "$t6", "$t7", "$t8", "memory"
+    );
+}
+
+pub fn syscall1(number: SYS, arg1: usize) usize {
+    return asm volatile ("syscall 0\n\t"
+        : [ret] "+$a0" (-> usize),
+        : [number] "$a7" (@intFromEnum(number)),
+          [arg1] "$a0" (arg1),
+        : "$t0", "$t1", "$t2", "$t3", "$t4", "$t5", "$t6", "$t7", "$t8", "memory"
+    );
+}
+
+pub fn syscall2(number: SYS, arg1: usize, arg2: usize) usize {
+    return asm volatile ("syscall 0\n\t"
+        : [ret] "+$a0" (-> usize),
+        : [number] "$a7" (@intFromEnum(number)),
+          [arg1] "$a0" (arg1),
+          [arg2] "$a1" (arg2),
+        : "$t0", "$t1", "$t2", "$t3", "$t4", "$t5", "$t6", "$t7", "$t8", "memory"
+    );
+}
+
+pub fn syscall3(number: SYS, arg1: usize, arg2: usize, arg3: usize) usize {
+    return asm volatile ("syscall 0\n\t"
+        : [ret] "+$a0" (-> usize),
+        : [number] "$a7" (@intFromEnum(number)),
+          [arg1] "$a0" (arg1),
+          [arg2] "$a1" (arg2),
+          [arg3] "$a2" (arg3),
+        : "$t0", "$t1", "$t2", "$t3", "$t4", "$t5", "$t6", "$t7", "$t8", "memory"
+    );
+}
+
+pub fn syscall4(number: SYS, arg1: usize, arg2: usize, arg3: usize, arg4: usize) usize {
+    return asm volatile ("syscall 0\n\t"
+        : [ret] "+$a0" (-> usize),
+        : [number] "$a7" (@intFromEnum(number)),
+          [arg1] "$a0" (arg1),
+          [arg2] "$a1" (arg2),
+          [arg3] "$a2" (arg3),
+          [arg4] "$a3" (arg4),
+        : "$t0", "$t1", "$t2", "$t3", "$t4", "$t5", "$t6", "$t7", "$t8", "memory"
+    );
+}
+
+pub fn syscall5(number: SYS, arg1: usize, arg2: usize, arg3: usize, arg4: usize, arg5: usize) usize {
+    return asm volatile ("syscall 0\n\t"
+        : [ret] "+$a0" (-> usize),
+        : [number] "$a7" (@intFromEnum(number)),
+          [arg1] "$a0" (arg1),
+          [arg2] "$a1" (arg2),
+          [arg3] "$a2" (arg3),
+          [arg4] "$a3" (arg4),
+          [arg5] "$a4" (arg5),
+        : "$t0", "$t1", "$t2", "$t3", "$t4", "$t5", "$t6", "$t7", "$t8", "memory"
+    );
+}
+
+pub fn syscall6(
+    number: SYS,
+    arg1: usize,
+    arg2: usize,
+    arg3: usize,
+    arg4: usize,
+    arg5: usize,
+    arg6: usize,
+) usize {
+    return asm volatile ("syscall 0\n\t"
+        : [ret] "+$a0" (-> usize),
+        : [number] "$a7" (@intFromEnum(number)),
+          [arg1] "$a0" (arg1),
+          [arg2] "$a1" (arg2),
+          [arg3] "$a2" (arg3),
+          [arg4] "$a3" (arg4),
+          [arg5] "$a4" (arg5),
+          [arg6] "$a5" (arg6),
+        : "$t0", "$t1", "$t2", "$t3", "$t4", "$t5", "$t6", "$t7", "$t8", "memory"
+    );
+}
+
+pub fn syscall7(
+    number: SYS,
+    arg1: usize,
+    arg2: usize,
+    arg3: usize,
+    arg4: usize,
+    arg5: usize,
+    arg6: usize,
+    arg7: usize,
+) usize {
+    return asm volatile ("syscall 0\n\t"
+        : [ret] "+$a0" (-> usize),
+        : [number] "$a7" (@intFromEnum(number)),
+          [arg1] "$a0" (arg1),
+          [arg2] "$a1" (arg2),
+          [arg3] "$a2" (arg3),
+          [arg4] "$a3" (arg4),
+          [arg5] "$a4" (arg5),
+          [arg6] "$a5" (arg6),
+          [arg7] "$a6" (arg7),
+        : "$t0", "$t1", "$t2", "$t3", "$t4", "$t5", "$t6", "$t7", "$t8", "memory"
+    );
+}
 
 pub const LOCK = struct {
     pub const SH = 1;
@@ -129,4 +236,18 @@ pub const Stat = extern struct {
     pub fn ctime(self: @This()) timespec {
         return self.ctim;
     }
+};
+
+pub const mcontext_t = extern struct {
+    pc: usize,
+    regs: [32]usize,
+    flags: u32,
+};
+
+pub const ucontext_t = extern struct {
+    flags: usize,
+    link: ?*ucontext_t,
+    stack: stack_t,
+    sigmask: sigset_t,
+    mcontext: mcontext_t,
 };
