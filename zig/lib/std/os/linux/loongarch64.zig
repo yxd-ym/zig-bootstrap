@@ -14,3 +14,12 @@ const sigset_t = linux.sigset_t;
 const timespec = std.os.linux.timespec;
 
 // TODO
+
+pub const blksize_t = i32;
+pub const nlink_t = u32;
+pub const time_t = isize;
+pub const mode_t = u32;
+pub const off_t = isize;
+pub const ino_t = usize;
+pub const dev_t = usize;
+pub const blkcnt_t = isize;
