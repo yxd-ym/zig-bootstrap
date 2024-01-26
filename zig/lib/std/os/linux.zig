@@ -43,6 +43,7 @@ const arch_bits = switch (native_arch) {
     .mips64, .mips64el => @import("linux/mips64.zig"),
     .powerpc, .powerpcle => @import("linux/powerpc.zig"),
     .powerpc64, .powerpc64le => @import("linux/powerpc64.zig"),
+    .loongarch64 => @import("linux/loongarch64.zig"),
     else => struct {},
 };
 pub const syscall0 = syscall_bits.syscall0;
@@ -106,6 +107,7 @@ pub const SYS = switch (@import("builtin").cpu.arch) {
     .mips64, .mips64el => syscalls.Mips64,
     .powerpc, .powerpcle => syscalls.PowerPC,
     .powerpc64, .powerpc64le => syscalls.PowerPC64,
+    .loongarch64 => syscalls.LoongArch64,
     else => @compileError("The Zig Standard Library is missing syscall definitions for the target CPU architecture"),
 };
 
@@ -3658,12 +3660,13 @@ pub fn CPU_COUNT(set: cpu_set_t) cpu_count_t {
 
 pub const MINSIGSTKSZ = switch (native_arch) {
     .x86, .x86_64, .arm, .mipsel => 2048,
+    .loongarch64 => 4096,
     .aarch64 => 5120,
     else => @compileError("MINSIGSTKSZ not defined for this architecture"),
 };
 pub const SIGSTKSZ = switch (native_arch) {
     .x86, .x86_64, .arm, .mipsel => 8192,
-    .aarch64 => 16384,
+    .aarch64, .loongarch64 => 16384,
     else => @compileError("SIGSTKSZ not defined for this architecture"),
 };
 
@@ -6006,6 +6009,7 @@ pub const AUDIT = struct {
             .arm, .thumb => .ARM,
             .riscv64 => .RISCV64,
             .sparc64 => .SPARC64,
+            .loongarch64 => .LOONGARCH64,
             .mips => .MIPS,
             .mipsel => .MIPSEL,
             .powerpc => .PPC,
@@ -6020,6 +6024,7 @@ pub const AUDIT = struct {
         CSKY = toAudit(.csky),
         HEXAGON = @intFromEnum(std.elf.EM.HEXAGON),
         X86 = toAudit(.x86),
+        LOONGARCH64 = toAudit(.loongarch64),
         M68K = toAudit(.m68k),
         MIPS = toAudit(.mips),
         MIPSEL = toAudit(.mips) | LE,
@@ -6047,6 +6052,7 @@ pub const AUDIT = struct {
                 .riscv64,
                 .sparc64,
                 .x86_64,
+                .loongarch64,
                 => res |= @"64BIT",
                 else => {},
             }

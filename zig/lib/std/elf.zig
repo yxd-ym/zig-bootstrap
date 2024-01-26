@@ -1628,6 +1628,9 @@ pub const EM = enum(u16) {
     /// C-SKY
     CSKY = 252,
 
+    /// LoongArch
+    LOONGARCH = 258,
+
     /// Fujitsu FR-V
     FRV = 0x5441,
 
@@ -1657,6 +1660,7 @@ pub const EM = enum(u16) {
             .SPARCV9 => .sparc64,
             .S390 => .s390x,
             .SPU_2 => .spu_2,
+            .LOONGARCH => .loongarch64, // FIXME: Is this correct?
             // there's many cases we don't (yet) handle, or will never have a
             // zig target cpu arch equivalent (such as null).
             else => null,
