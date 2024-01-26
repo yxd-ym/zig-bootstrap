@@ -23,3 +23,8 @@ pub const off_t = isize;
 pub const ino_t = usize;
 pub const dev_t = usize;
 pub const blkcnt_t = isize;
+
+pub const timeval = extern struct {
+    tv_sec: time_t,
+    tv_usec: i64,
+};
