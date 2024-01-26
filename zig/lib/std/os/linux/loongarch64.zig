@@ -28,3 +28,21 @@ pub const timeval = extern struct {
     tv_sec: time_t,
     tv_usec: i64,
 };
+
+pub const MAP = struct {
+    /// stack-like segment
+    pub const GROWSDOWN = 0x0100;
+    /// ETXTBSY
+    pub const DENYWRITE = 0x0800;
+    /// mark it as an executable
+    pub const EXECUTABLE = 0x1000;
+    /// pages are locked
+    pub const LOCKED = 0x2000;
+    /// don't check for reservations
+    pub const NORESERVE = 0x4000;
+};
+
+pub const VDSO = struct {
+    pub const CGT_SYM = "__kernel_clock_gettime";
+    pub const CGT_VER = "LINUX_5.10";
+};
