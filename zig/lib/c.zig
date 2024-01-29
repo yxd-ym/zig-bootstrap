@@ -552,15 +552,15 @@ fn clone() callconv(.Naked) void {
         .loongarch64 => {
             asm volatile (
                 \\ /* Align stack to 16.  */
-                \\ BSTRINS		a1, zero, 3, 0
+                \\ bstrins.d		a1, zero, 3, 0
                 \\
                 \\ /* Sanity check arguments.  */
                 \\ beqz		a0, L (invalid) /* No NULL function pointers.  */
                 \\ beqz		a1, L (invalid) /* No NULL stack pointers.  */
                 \\
-                \\ ADDI 		a1, a1, -16 /* Reserve argument save space.  */
-                \\ REG_S		a0, a1, 0   /* Save function pointer.  */
-                \\ REG_S		a3, a1, SZREG   /* Save argument pointer.  */
+                \\ addi.d		a1, a1, -16 /* Reserve argument save space.  */
+                \\ st.d		a0, a1, 0   /* Save function pointer.  */
+                \\ st.d		a3, a1, SZREG   /* Save argument pointer.  */
                 \\
                 \\ /* The syscall expects the args to be in different slots.  */
                 \\ or		a0, a2, zero
@@ -569,7 +569,7 @@ fn clone() callconv(.Naked) void {
                 \\ or		a4, a5, zero
                 \\
                 \\ /* Do the system call.  */
-                \\ LI		a7,__NR_clone
+                \\ li.d		a7, 220
                 \\ syscall		0
                 \\
                 \\ blt		a0, zero ,L (error)
@@ -579,7 +579,7 @@ fn clone() callconv(.Naked) void {
                 \\ ret
                 \\
                 \\L (invalid):
-                \\ LI		a0, -EINVAL
+                \\ li.d		a0, -EINVAL
                 \\
                 \\ /* Something bad happened -- no child created.  */
                 \\L (error):
