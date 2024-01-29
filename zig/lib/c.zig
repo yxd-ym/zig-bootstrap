@@ -552,34 +552,34 @@ fn clone() callconv(.Naked) void {
         .loongarch64 => {
             asm volatile (
                 \\ /* Align stack to 16.  */
-                \\ bstrins.d		a1, zero, 3, 0
+                \\ bstrins.d		$a1, zero, 3, 0
                 \\
                 \\ /* Sanity check arguments.  */
-                \\ beqz		a0, L (invalid) /* No NULL function pointers.  */
-                \\ beqz		a1, L (invalid) /* No NULL stack pointers.  */
+                \\ beqz		$a0, L (invalid) /* No NULL function pointers.  */
+                \\ beqz		$a1, L (invalid) /* No NULL stack pointers.  */
                 \\
-                \\ addi.d		a1, a1, -16 /* Reserve argument save space.  */
-                \\ st.d		a0, a1, 0   /* Save function pointer.  */
-                \\ st.d		a3, a1, SZREG   /* Save argument pointer.  */
+                \\ addi.d		$a1, $a1, -16 /* Reserve argument save space.  */
+                \\ st.d		$a0, $a1, 0   /* Save function pointer.  */
+                \\ st.d		$a3, $a1, 8   /* Save argument pointer.  */
                 \\
                 \\ /* The syscall expects the args to be in different slots.  */
-                \\ or		a0, a2, zero
-                \\ or		a2, a4, zero
-                \\ or		a3, a6, zero
-                \\ or		a4, a5, zero
+                \\ or		$a0, $a2, zero
+                \\ or		$a2, $a4, zero
+                \\ or		$a3, $a6, zero
+                \\ or		$a4, $a5, zero
                 \\
                 \\ /* Do the system call.  */
-                \\ li.d		a7, 220
+                \\ li.d		$a7, 220
                 \\ syscall		0
                 \\
-                \\ blt		a0, zero ,L (error)
-                \\ beqz		a0,L (thread_start)
+                \\ blt		$a0, zero ,L (error)
+                \\ beqz		$a0,L (thread_start)
                 \\
                 \\ /* Successful return from the parent.  */
                 \\ ret
                 \\
                 \\L (invalid):
-                \\ li.d		a0, -EINVAL
+                \\ li.d		$a0, -EINVAL
                 \\
                 \\ /* Something bad happened -- no child created.  */
                 \\L (error):
