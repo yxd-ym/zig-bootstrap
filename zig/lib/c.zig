@@ -591,7 +591,7 @@ fn clone() callconv(.Naked) void {
                 \\ ld.d		$a0, $sp, 8   /* Argument pointer.  */
                 \\
                 \\ /* Call the user's function.  */
-                \\ jirl		ra, $a1, 0
+                \\ jirl		$ra, $a1, 0
                 \\
                 \\ /* Call exit with the function's return value.  */
                 \\ li.d		$a7, 93
