@@ -121,6 +121,10 @@ pub fn syscall7(
     );
 }
 
+const CloneFn = *const fn (arg: usize) callconv(.C) u8;
+
+pub extern fn clone(func: CloneFn, stack: usize, flags: u32, arg: usize, ptid: *i32, tls: usize, ctid: *i32) usize;
+
 pub const LOCK = struct {
     pub const SH = 1;
     pub const EX = 2;
