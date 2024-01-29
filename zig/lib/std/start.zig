@@ -332,6 +332,12 @@ fn _start() callconv(.Naked) noreturn {
             \\ ba %[posixCallMainAndExit]
             \\  stx %%l0, %[argc_argv_ptr]
             ,
+            .loongarch64 =>
+            // TODO: add start
+            \\ 
+            \\ 
+            \\ b %[posixCallMainAndExit]
+            ,
             else => @compileError("unsupported arch"),
         }
         : [argc_argv_ptr] "=m" (argc_argv_ptr),
