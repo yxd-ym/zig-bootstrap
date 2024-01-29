@@ -125,6 +125,17 @@ const CloneFn = *const fn (arg: usize) callconv(.C) u8;
 
 pub extern fn clone(func: CloneFn, stack: usize, flags: u32, arg: usize, ptid: *i32, tls: usize, ctid: *i32) usize;
 
+pub const restore = restore_rt;
+
+pub fn restore_rt() callconv(.Naked) noreturn {
+    asm volatile (
+        \\ syscall      0
+        :
+        : [number] "{$a7}" (@intFromEnum(SYS.rt_sigreturn)),
+        : "$t0", "$t1", "$t2", "$t3", "$t4", "$t5", "$t6", "$t7", "$t8", "memory"
+    );
+}
+
 pub const LOCK = struct {
     pub const SH = 1;
     pub const EX = 2;
