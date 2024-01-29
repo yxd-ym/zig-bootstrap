@@ -552,7 +552,7 @@ fn clone() callconv(.Naked) void {
         .loongarch64 => {
             asm volatile (
                 \\ /* Align stack to 16.  */
-                \\ bstrins.d		$a1, 0, 3, 0
+                \\ bstrins.d		$a1, $r0, 3, 0
                 \\
                 \\ /* Sanity check arguments.  */
                 \\ beqz		$a0, L (invalid) /* No NULL function pointers.  */
@@ -563,16 +563,16 @@ fn clone() callconv(.Naked) void {
                 \\ st.d		$a3, $a1, 8   /* Save argument pointer.  */
                 \\
                 \\ /* The syscall expects the args to be in different slots.  */
-                \\ or		$a0, $a2, 0
-                \\ or		$a2, $a4, 0
-                \\ or		$a3, $a6, 0
-                \\ or		$a4, $a5, 0
+                \\ or		$a0, $a2, $r0
+                \\ or		$a2, $a4, $r0
+                \\ or		$a3, $a6, $r0
+                \\ or		$a4, $a5, $r0
                 \\
                 \\ /* Do the system call.  */
                 \\ li.d		$a7, 220
                 \\ syscall		0
                 \\
-                \\ blt		$a0, 0 ,L (error)
+                \\ blt		$a0, $r0 ,L (error)
                 \\ beqz		$a0,L (thread_start)
                 \\
                 \\ /* Successful return from the parent.  */
