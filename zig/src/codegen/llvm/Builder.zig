@@ -8288,6 +8288,13 @@ pub fn initializeLLVMTarget(arch: std.Target.Cpu.Arch) void {
                 // There is no LLVMInitializeARCAsmParser function.
             }
         },
+        .loongarch32, .loongarch64 => {
+            llvm.LLVMInitializeLoongArchTarget();
+            llvm.LLVMInitializeLoongArchTargetInfo();
+            llvm.LLVMInitializeLoongArchTargetMC();
+            llvm.LLVMInitializeLoongArchAsmPrinter();
+            llvm.LLVMInitializeLoongArchAsmParser();
+        },
 
         // LLVM backends that have no initialization functions.
         .tce,
@@ -8306,8 +8313,6 @@ pub fn initializeLLVMTarget(arch: std.Target.Cpu.Arch) void {
         .renderscript32,
         .renderscript64,
         .dxil,
-        .loongarch32,
-        .loongarch64,
         => {},
 
         .spu_2 => unreachable, // LLVM does not support this backend
