@@ -266,3 +266,5 @@ pub const ucontext_t = extern struct {
     sigmask: sigset_t,
     mcontext: mcontext_t,
 };
+
+pub const Elf_Symndx = u32;
