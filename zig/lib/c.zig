@@ -555,8 +555,8 @@ fn clone() callconv(.Naked) void {
                 \\ bstrins.d		$a1, $r0, 3, 0
                 \\
                 \\ /* Sanity check arguments.  */
-                \\ beqz		$a0, L (invalid) /* No NULL function pointers.  */
-                \\ beqz		$a1, L (invalid) /* No NULL stack pointers.  */
+                \\ beqz		$a0, l_invalid /* No NULL function pointers.  */
+                \\ beqz		$a1, l_invalid /* No NULL stack pointers.  */
                 \\
                 \\ addi.d		$a1, $a1, -16 /* Reserve argument save space.  */
                 \\ st.d		$a0, $a1, 0   /* Save function pointer.  */
@@ -572,18 +572,30 @@ fn clone() callconv(.Naked) void {
                 \\ li.d		$a7, 220
                 \\ syscall		0
                 \\
-                \\ blt		$a0, $r0 ,L (error)
-                \\ beqz		$a0,L (thread_start)
+                \\ blt		$a0, $r0 ,l_error
+                \\ beqz		$a0,l_thread_start
                 \\
                 \\ /* Successful return from the parent.  */
                 \\ ret
                 \\
-                \\L (invalid):
+                \\l_invalid:
                 \\ li.d		$a0, -EINVAL
                 \\
                 \\ /* Something bad happened -- no child created.  */
-                \\L (error):
+                \\l_error:
                 \\ b		__syscall_error
+                \\
+                \\l_thread_start:
+                \\ /* Restore the arg for user's function.  */
+                \\ ld.d		$a1, $sp, 0   /* Function pointer.  */
+                \\ ld.d		$a0, $sp, 8   /* Argument pointer.  */
+                \\
+                \\ /* Call the user's function.  */
+                \\ jirl		ra, $a1, 0
+                \\
+                \\ /* Call exit with the function's return value.  */
+                \\ li.d		$a7, 93
+                \\ syscall		0
                 \\
             );
         },
