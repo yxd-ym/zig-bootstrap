@@ -1455,9 +1455,8 @@ pub fn fstat(fd: i32, stat_buf: *Stat) usize {
         return syscall2(.fstat64, @as(usize, @bitCast(@as(isize, fd))), @intFromPtr(stat_buf));
     } else if (@hasField(SYS, "fstat")) {
         return syscall2(.fstat, @as(usize, @bitCast(@as(isize, fd))), @intFromPtr(stat_buf));
-    } else {
-        return @as(usize, @bitCast(-@as(isize, @intFromEnum(E.NOSYS))));
     }
+    return @as(usize, @bitCast(-@as(isize, @intFromEnum(E.NOSYS))));
 }
 
 pub fn stat(pathname: [*:0]const u8, statbuf: *Stat) usize {
