@@ -1193,8 +1193,8 @@ const LinuxThreadImpl = struct {
                     \\ ori	$a7, $zero, 93
                     \\ syscall	0				# call exit
                     :
-                    : [ptr] "{a0}" (@intFromPtr(self.mapped.ptr)),
-                      [len] "{a1}" (self.mapped.len),
+                    : [ptr] "{$a0}" (@intFromPtr(self.mapped.ptr)),
+                      [len] "{$a1}" (self.mapped.len),
                     : "$t0", "$t1", "$t2", "$t3", "$t4", "$t5", "$t6", "$t7", "$t8", "memory"
                 ),
                 else => |cpu_arch| @compileError("Unsupported linux arch: " ++ @tagName(cpu_arch)),
