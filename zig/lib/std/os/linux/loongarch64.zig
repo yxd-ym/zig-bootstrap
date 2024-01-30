@@ -25,8 +25,9 @@ pub fn syscall0(number: SYS) usize {
 pub fn syscall1(number: SYS, arg1: usize) usize {
     return asm volatile (
         \\ syscall 0
+        \\ or %[ret], $zero, $a0
         \\
-        : [ret] "={$a0}" (-> usize),
+        : [ret] "=r" (-> usize),
         : [number] "{$a7}" (@intFromEnum(number)),
           [arg1] "{$a0}" (arg1),
         : "$t0", "$t1", "$t2", "$t3", "$t4", "$t5", "$t6", "$t7", "$t8", "memory"
@@ -36,8 +37,9 @@ pub fn syscall1(number: SYS, arg1: usize) usize {
 pub fn syscall2(number: SYS, arg1: usize, arg2: usize) usize {
     return asm volatile (
         \\ syscall 0
+        \\ or %[ret], $zero, $a0
         \\
-        : [ret] "={$a0}" (-> usize),
+        : [ret] "=r" (-> usize),
         : [number] "{$a7}" (@intFromEnum(number)),
           [arg1] "{$a0}" (arg1),
           [arg2] "{$a1}" (arg2),
@@ -48,8 +50,9 @@ pub fn syscall2(number: SYS, arg1: usize, arg2: usize) usize {
 pub fn syscall3(number: SYS, arg1: usize, arg2: usize, arg3: usize) usize {
     return asm volatile (
         \\ syscall 0
+        \\ or %[ret], $zero, $a0
         \\
-        : [ret] "={$a0}" (-> usize),
+        : [ret] "=r" (-> usize),
         : [number] "{$a7}" (@intFromEnum(number)),
           [arg1] "{$a0}" (arg1),
           [arg2] "{$a1}" (arg2),
@@ -61,8 +64,9 @@ pub fn syscall3(number: SYS, arg1: usize, arg2: usize, arg3: usize) usize {
 pub fn syscall4(number: SYS, arg1: usize, arg2: usize, arg3: usize, arg4: usize) usize {
     return asm volatile (
         \\ syscall 0
+        \\ or %[ret], $zero, $a0
         \\
-        : [ret] "={$a0}" (-> usize),
+        : [ret] "=r" (-> usize),
         : [number] "{$a7}" (@intFromEnum(number)),
           [arg1] "{$a0}" (arg1),
           [arg2] "{$a1}" (arg2),
@@ -75,8 +79,9 @@ pub fn syscall4(number: SYS, arg1: usize, arg2: usize, arg3: usize, arg4: usize)
 pub fn syscall5(number: SYS, arg1: usize, arg2: usize, arg3: usize, arg4: usize, arg5: usize) usize {
     return asm volatile (
         \\ syscall 0
+        \\ or %[ret], $zero, $a0
         \\
-        : [ret] "={$a0}" (-> usize),
+        : [ret] "=r" (-> usize),
         : [number] "{$a7}" (@intFromEnum(number)),
           [arg1] "{$a0}" (arg1),
           [arg2] "{$a1}" (arg2),
@@ -98,8 +103,9 @@ pub fn syscall6(
 ) usize {
     return asm volatile (
         \\ syscall 0
+        \\ or %[ret], $zero, $a0
         \\
-        : [ret] "={$a0}" (-> usize),
+        : [ret] "=r" (-> usize),
         : [number] "{$a7}" (@intFromEnum(number)),
           [arg1] "{$a0}" (arg1),
           [arg2] "{$a1}" (arg2),
