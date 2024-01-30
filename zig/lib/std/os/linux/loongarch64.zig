@@ -24,7 +24,7 @@ pub fn syscall1(number: SYS, arg1: usize) usize {
     return asm volatile ("syscall 0\n\t"
         : [ret] "={$a0}" (-> usize),
         : [number] "{$a7}" (@intFromEnum(number)),
-          [arg1] "${$a0}" (arg1),
+          [arg1] "{$a0}" (arg1),
         : "$t0", "$t1", "$t2", "$t3", "$t4", "$t5", "$t6", "$t7", "$t8", "memory"
     );
 }
