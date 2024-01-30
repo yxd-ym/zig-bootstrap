@@ -63,11 +63,11 @@ pub fn syscall4(number: SYS, arg1: usize, arg2: usize, arg3: usize, arg4: usize)
         \\ syscall 0
         \\
         : [ret] "={$a0}" (-> usize),
-        : [number] "${a7}" (@intFromEnum(number)),
-          [arg1] "${a0}" (arg1),
-          [arg2] "${a1}" (arg2),
-          [arg3] "${a2}" (arg3),
-          [arg4] "${a3}" (arg4),
+        : [number] "{$a7}" (@intFromEnum(number)),
+          [arg1] "{$a0}" (arg1),
+          [arg2] "{$a1}" (arg2),
+          [arg3] "{$a2}" (arg3),
+          [arg4] "{$a3}" (arg4),
         : "$t0", "$t1", "$t2", "$t3", "$t4", "$t5", "$t6", "$t7", "$t8", "memory"
     );
 }
