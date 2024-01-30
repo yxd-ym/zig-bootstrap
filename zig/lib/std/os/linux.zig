@@ -1453,8 +1453,10 @@ pub fn accept4(fd: i32, noalias addr: ?*sockaddr, noalias len: ?*socklen_t, flag
 pub fn fstat(fd: i32, stat_buf: *Stat) usize {
     if (@hasField(SYS, "fstat64")) {
         return syscall2(.fstat64, @as(usize, @bitCast(@as(isize, fd))), @intFromPtr(stat_buf));
-    } else {
+    } else if (@hasField(SYS, "fstat")) {
         return syscall2(.fstat, @as(usize, @bitCast(@as(isize, fd))), @intFromPtr(stat_buf));
+    } else {
+        return @as(usize, @bitCast(-@as(isize, @intFromEnum(E.NOSYS))));
     }
 }
 
