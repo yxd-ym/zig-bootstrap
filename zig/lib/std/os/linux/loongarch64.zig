@@ -17,7 +17,7 @@ pub fn syscall0(number: SYS) usize {
         \\ syscall 0
         \\
         : [ret] "={$a0}" (-> usize),
-        : [number] "$a7" (@intFromEnum(number)),
+        : [number] "{$a7}" (@intFromEnum(number)),
         : "$t0", "$t1", "$t2", "$t3", "$t4", "$t5", "$t6", "$t7", "$t8", "memory"
     );
 }
