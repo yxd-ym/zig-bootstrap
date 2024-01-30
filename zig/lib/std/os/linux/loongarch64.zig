@@ -111,32 +111,6 @@ pub fn syscall6(
     );
 }
 
-pub fn syscall7(
-    number: SYS,
-    arg1: usize,
-    arg2: usize,
-    arg3: usize,
-    arg4: usize,
-    arg5: usize,
-    arg6: usize,
-    arg7: usize,
-) usize {
-    return asm volatile (
-        \\ syscall 0
-        \\
-        : [ret] "={$a0}" (-> usize),
-        : [number] "{$a7}" (@intFromEnum(number)),
-          [arg1] "{$a0}" (arg1),
-          [arg2] "{$a1}" (arg2),
-          [arg3] "{$a2}" (arg3),
-          [arg4] "{$a3}" (arg4),
-          [arg5] "{$a4}" (arg5),
-          [arg6] "{$a5}" (arg6),
-          [arg7] "{$a6}" (arg7),
-        : "$t0", "$t1", "$t2", "$t3", "$t4", "$t5", "$t6", "$t7", "$t8", "memory"
-    );
-}
-
 const CloneFn = *const fn (arg: usize) callconv(.C) u8;
 
 pub extern fn clone(func: CloneFn, stack: usize, flags: u32, arg: usize, ptid: *i32, tls: usize, ctid: *i32) usize;
