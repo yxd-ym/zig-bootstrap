@@ -583,7 +583,8 @@ fn clone() callconv(.Naked) void {
                 \\
                 \\ /* Something bad happened -- no child created.  */
                 \\l_error:
-                \\ b		__syscall_error
+                \\ /* TODO: add errno handling */
+                \\ ret
                 \\
                 \\l_thread_start:
                 \\ /* Restore the arg for user's function.  */
