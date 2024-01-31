@@ -112,7 +112,7 @@ pub const restore = restore_rt;
 
 pub fn restore_rt() callconv(.Naked) noreturn {
     asm volatile (
-        \\ or r11, $zero, %[number]
+        \\ or $a7, $zero, %[number]
         \\ syscall 0
         \\
         :
