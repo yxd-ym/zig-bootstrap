@@ -333,9 +333,13 @@ fn _start() callconv(.Naked) noreturn {
             \\  stx %%l0, %[argc_argv_ptr]
             ,
             .loongarch64 =>
-            // TODO: add start
-            \\ 
-            \\ 
+            \\ ori  %fp, %zero, 0
+            \\ st.d %sp, %[argc_argv_ptr], 0
+            \\ .set push
+            \\ .set noat
+            \\ addi.d $1, $zero, -16
+            \\ and $sp, $sp, $1
+            \\ .set pop
             \\ b %[posixCallMainAndExit]
             ,
             else => @compileError("unsupported arch"),
