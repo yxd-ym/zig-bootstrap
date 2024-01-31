@@ -1455,8 +1455,6 @@ pub fn fstat(fd: i32, stat_buf: *Stat) usize {
         return syscall2(.fstat64, @as(usize, @bitCast(@as(isize, fd))), @intFromPtr(stat_buf));
     } else if (@hasField(SYS, "fstat")) {
         return syscall2(.fstat, @as(usize, @bitCast(@as(isize, fd))), @intFromPtr(stat_buf));
-    } else if (@hasDecl(std, "fstat")) {
-        return @as(usize, @bitCast(-@as(isize, std.fstat(@as(isize, fd), @intFromPtr(stat_buf)))));
     }
     return @as(usize, @bitCast(-@as(isize, @intFromEnum(E.NOSYS))));
 }
@@ -1482,8 +1480,6 @@ pub fn fstatat(dirfd: i32, path: [*:0]const u8, stat_buf: *Stat, flags: u32) usi
         return syscall4(.fstatat64, @as(usize, @bitCast(@as(isize, dirfd))), @intFromPtr(path), @intFromPtr(stat_buf), flags);
     } else if (@hasField(SYS, "fstatat")) {
         return syscall4(.fstatat, @as(usize, @bitCast(@as(isize, dirfd))), @intFromPtr(path), @intFromPtr(stat_buf), flags);
-    } else if (@hasDecl(std, "fstatat")) {
-        return @as(usize, @bitCast(-@as(isize, std.fstatat(@as(isize, dirfd), @intFromPtr(path), @intFromPtr(stat_buf), flags))));
     }
     return @as(usize, @bitCast(-@as(isize, @intFromEnum(E.NOSYS))));
 }
