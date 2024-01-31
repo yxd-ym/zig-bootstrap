@@ -550,54 +550,30 @@ fn clone() callconv(.Naked) void {
             );
         },
         .loongarch64 => {
+            // __clone(func, stack, flags, arg, ptid, tls, ctid)
+            //          a0,    a1,   a2,    a3,  a4,  a5,   a6
+            // sys_clone(flags, stack, ptid, ctid, tls)
+            //            a0,    a1,   a2,    a3,  a4
             asm volatile (
-                \\ /* Align stack to 16.  */
-                \\ bstrins.d		$a1, $zero, 3, 0
+                \\ # Save function pointer and argument pointer on new thread stack
+                \\ addi.d  $a1, $a1, -16
+                \\ st.d    $a0, $a1, 0     # save function pointer
+                \\ st.d    $a3, $a1, 8     # save argument pointer
+                \\ or      $a0, $a2, $zero
+                \\ or      $a2, $a4, $zero
+                \\ or      $a3, $a6, $zero
+                \\ or      $a4, $a5, $zero
+                \\ ori     $a7, $zero, 220
+                \\ syscall 0               # call clone
                 \\
-                \\ /* Sanity check arguments.  */
-                \\ beqz		$a0, l_invalid /* No NULL function pointers.  */
-                \\ beqz		$a1, l_invalid /* No NULL stack pointers.  */
-                \\
-                \\ addi.d		$a1, $a1, -16 /* Reserve argument save space.  */
-                \\ st.d		$a0, $a1, 0   /* Save function pointer.  */
-                \\ st.d		$a3, $a1, 8   /* Save argument pointer.  */
-                \\
-                \\ /* The syscall expects the args to be in different slots.  */
-                \\ or		$a0, $a2, $zero
-                \\ or		$a2, $a4, $zero
-                \\ or		$a3, $a6, $zero
-                \\ or		$a4, $a5, $zero
-                \\
-                \\ /* Do the system call.  */
-                \\ li.d		$a7, 220
-                \\ syscall		0
-                \\
-                \\ blt		$a0, $zero ,l_error
-                \\ beqz		$a0,l_thread_start
-                \\
-                \\ /* Successful return from the parent.  */
-                \\ ret
-                \\
-                \\l_invalid:
-                \\ li.d		$a0, -EINVAL
-                \\
-                \\ /* Something bad happened -- no child created.  */
-                \\l_error:
-                \\ /* TODO: add errno handling */
-                \\ ret
-                \\
-                \\l_thread_start:
-                \\ /* Restore the arg for user's function.  */
-                \\ ld.d		$a1, $sp, 0   /* Function pointer.  */
-                \\ ld.d		$a0, $sp, 8   /* Argument pointer.  */
-                \\
-                \\ /* Call the user's function.  */
-                \\ jirl		$ra, $a1, 0
-                \\
-                \\ /* Call exit with the function's return value.  */
-                \\ li.d		$a7, 93
-                \\ syscall		0
-                \\
+                \\ beqz    $a0, child      # whether child process
+                \\ jirl    $zero, $ra, 0   # parent process return
+                \\child:
+                \\ ld.d    $t8, $sp, 0     # function pointer
+                \\ ld.d    $a0, $sp, 8     # argument pointer
+                \\ jirl    $ra, $t8, 0     # call the user's function
+                \\ ori     $a7, $zero, 93
+                \\ syscall	0               # child process exit
             );
         },
         else => @compileError("Implement clone() for this arch."),
