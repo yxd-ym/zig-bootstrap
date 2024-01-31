@@ -207,6 +207,8 @@ pub const VDSO = struct {
     pub const CGT_VER = "LINUX_5.10";
 };
 
+// loongarch64 actually does not support fstat/fstatat syscall.
+// This struct is here just for compatibility.
 pub const Stat = extern struct {
     dev: dev_t,
     ino: ino_t,
