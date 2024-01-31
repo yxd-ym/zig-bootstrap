@@ -215,9 +215,10 @@ pub fn setThreadPointer(addr: usize) void {
             );
         },
         .loongarch64 => {
-            // TODO: add asm.
             asm volatile (
-                \\
+                \\ or $tp, $zero, %[addr]
+                :
+                : [addr] "r" (addr),
             );
         },
         else => @compileError("Unsupported architecture"),
