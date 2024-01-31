@@ -63,7 +63,7 @@ const tls_variant = switch (native_arch) {
     .powerpcle,
     .powerpc64,
     .powerpc64le,
-    .loongarch64, // FIXME: is this correct?
+    .loongarch64,
     => TLSVariant.VariantI,
 
     .x86_64,
