@@ -335,11 +335,11 @@ fn _start() callconv(.Naked) noreturn {
             .loongarch64 =>
             \\ ori  $fp, $zero, 0
             \\ st.d $sp, %[argc_argv_ptr]
-            \\ .set push
-            \\ .set noat
+            \\ .set push;
+            \\ .set noat;
             \\ addi.d $1, $zero, -16
             \\ and $sp, $sp, $1
-            \\ .set pop
+            \\ .set pop;
             \\ b %[posixCallMainAndExit]
             ,
             else => @compileError("unsupported arch"),
