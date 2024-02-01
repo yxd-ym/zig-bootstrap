@@ -4476,8 +4476,8 @@ fn makedev(major: u32, minor: u32) u64 {
 
 fn timespecFrom(ts: statx_timestamp) timespec {
     return timespec{
-        .tv_sec = ts.sec,
-        .tv_nsec = ts.nsec,
+        .tv_sec = ts.tv_sec,
+        .tv_nsec = ts.tv_nsec,
     };
 }
 
