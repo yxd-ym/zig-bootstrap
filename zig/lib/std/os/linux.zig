@@ -1509,6 +1509,8 @@ pub fn fstatat(dirfd: i32, path: [*:0]const u8, stat_buf: *Stat, flags: u32) usi
         stat_buf.atim = timespecFrom(statx_buf.atime);
         stat_buf.mtim = timespecFrom(statx_buf.mtime);
         stat_buf.ctim = timespecFrom(statx_buf.ctime);
+
+        return 0;
     }
     return @as(usize, @bitCast(-@as(isize, @intFromEnum(E.NOSYS))));
 }
