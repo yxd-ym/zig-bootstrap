@@ -4479,7 +4479,7 @@ fn makedev(major: u32, minor: u32) u64 {
 fn timespecFrom(ts: statx_timestamp) timespec {
     return timespec{
         .tv_sec = @as(isize, @bitCast(ts.tv_sec)),
-        .tv_nsec = @as(isize, @bitCast(ts.tv_nsec)),
+        .tv_nsec = @as(isize, ts.tv_nsec),
     };
 }
 
