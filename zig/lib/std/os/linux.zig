@@ -1456,7 +1456,7 @@ pub fn fstat(fd: i32, stat_buf: *Stat) usize {
     } else if (@hasField(SYS, "fstat")) {
         return syscall2(.fstat, @as(usize, @bitCast(@as(isize, fd))), @intFromPtr(stat_buf));
     }
-    return @as(usize, @bitCast(-@as(isize, @intFromEnum(E.NOSYS))));
+    return fstatat(fd, "", stat_buf, AT.EMPTY_PATH);
 }
 
 pub fn stat(pathname: [*:0]const u8, statbuf: *Stat) usize {
@@ -1480,6 +1480,35 @@ pub fn fstatat(dirfd: i32, path: [*:0]const u8, stat_buf: *Stat, flags: u32) usi
         return syscall4(.fstatat64, @as(usize, @bitCast(@as(isize, dirfd))), @intFromPtr(path), @intFromPtr(stat_buf), flags);
     } else if (@hasField(SYS, "fstatat")) {
         return syscall4(.fstatat, @as(usize, @bitCast(@as(isize, dirfd))), @intFromPtr(path), @intFromPtr(stat_buf), flags);
+    } else if (@hasField(SYS, "statx")) {
+        var statx_buf: Statx = undefined;
+        const rc = syscall5(
+            .statx,
+            @as(usize, @bitCast(@as(isize, dirfd))),
+            @intFromPtr(path),
+            AT.NO_AUTOMOUNT | flags,
+            STATX_BASIC_STATS,
+            @intFromPtr(statx_buf),
+        );
+        if (rc != 0) {
+            return rc;
+        }
+
+        // fill in stat_buf with statx_buf
+        stat_buf.dev = makedev(statx_buf.dev_major, statx_buf.dev_minor);
+        stat_buf.ino = statx_buf.ino;
+        stat_buf.mode = statx_buf.mode;
+        stat_buf.nlink = statx_buf.nlink;
+        stat_buf.uid = statx_buf.uid;
+        stat_buf.gid = statx_buf.gid;
+        stat_buf.rdev = makedev(statx_buf.rdev_major, statx_buf.rdev_minor);
+        //
+        stat_buf.size = statx_buf.size;
+        stat_buf.blksize = statx_buf.blksize;
+        stat_buf.blocks = statx_buf.blocks;
+        stat_buf.atim = timespecFrom(statx_buf.atime);
+        stat_buf.mtim = timespecFrom(statx_buf.mtime);
+        stat_buf.ctim = timespecFrom(statx_buf.ctime);
     }
     return @as(usize, @bitCast(-@as(isize, @intFromEnum(E.NOSYS))));
 }
@@ -4436,6 +4465,21 @@ pub const Statx = extern struct {
 
     __pad2: [14]u64,
 };
+
+fn makedev(major: u32, minor: u32) u64 {
+    var majorH = @as(u64, major >> 12);
+    var majorL = @as(u64, major & 0xfff);
+    var minorH = @as(u64, minor >> 8);
+    var minorL = @as(u64, minor & 0xff);
+    return (majorH << 44) | (minorH << 20) | (majorL << 8) | minorL;
+}
+
+fn timespecFrom(ts: statx_timestamp) timespec {
+    return timespec{
+        .tv_sec = ts.sec,
+        .tv_nsec = ts.nsec,
+    };
+}
 
 pub const addrinfo = extern struct {
     flags: i32,
