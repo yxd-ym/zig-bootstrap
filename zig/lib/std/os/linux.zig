@@ -1495,17 +1495,17 @@ pub fn fstatat(dirfd: i32, path: [*:0]const u8, stat_buf: *Stat, flags: u32) usi
         }
 
         // fill in stat_buf with statx_buf
-        stat_buf.dev = makedev(statx_buf.dev_major, statx_buf.dev_minor);
-        stat_buf.ino = statx_buf.ino;
-        stat_buf.mode = statx_buf.mode;
+        stat_buf.dev = @as(dev_t, makedev(statx_buf.dev_major, statx_buf.dev_minor));
+        stat_buf.ino = @as(ino_t, statx_buf.ino);
+        stat_buf.mode = @as(mode_t, statx_buf.mode);
         stat_buf.nlink = statx_buf.nlink;
         stat_buf.uid = statx_buf.uid;
         stat_buf.gid = statx_buf.gid;
-        stat_buf.rdev = makedev(statx_buf.rdev_major, statx_buf.rdev_minor);
+        stat_buf.rdev = @as(dev_t, makedev(statx_buf.rdev_major, statx_buf.rdev_minor));
         //
-        stat_buf.size = statx_buf.size;
-        stat_buf.blksize = statx_buf.blksize;
-        stat_buf.blocks = statx_buf.blocks;
+        stat_buf.size = @as(off_t, @bitCast(statx_buf.size));
+        stat_buf.blksize = @as(blksize_t, @bitCast(statx_buf.blksize));
+        stat_buf.blocks = @as(blkcnt_t, @bitCast(statx_buf.blocks));
         stat_buf.atim = timespecFrom(statx_buf.atime);
         stat_buf.mtim = timespecFrom(statx_buf.mtime);
         stat_buf.ctim = timespecFrom(statx_buf.ctime);
@@ -4478,8 +4478,8 @@ fn makedev(major: u32, minor: u32) u64 {
 
 fn timespecFrom(ts: statx_timestamp) timespec {
     return timespec{
-        .tv_sec = ts.tv_sec,
-        .tv_nsec = ts.tv_nsec,
+        .tv_sec = @as(isize, @bitCast(ts.tv_sec)),
+        .tv_nsec = @as(isize, @bitCast(ts.tv_nsec)),
     };
 }
 
