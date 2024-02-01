@@ -1488,7 +1488,7 @@ pub fn fstatat(dirfd: i32, path: [*:0]const u8, stat_buf: *Stat, flags: u32) usi
             @intFromPtr(path),
             AT.NO_AUTOMOUNT | flags,
             STATX_BASIC_STATS,
-            @intFromPtr(statx_buf),
+            @intFromPtr(&statx_buf),
         );
         if (rc != 0) {
             return rc;
