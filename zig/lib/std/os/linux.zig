@@ -1481,7 +1481,7 @@ pub fn fstatat(dirfd: i32, path: [*:0]const u8, stat_buf: *Stat, flags: u32) usi
     } else if (@hasField(SYS, "fstatat")) {
         return syscall4(.fstatat, @as(usize, @bitCast(@as(isize, dirfd))), @intFromPtr(path), @intFromPtr(stat_buf), flags);
     } else if (@hasField(SYS, "statx")) {
-        var statx_buf: Statx = undefined;
+        const statx_buf: Statx = undefined;
         const rc = syscall5(
             .statx,
             @as(usize, @bitCast(@as(isize, dirfd))),
@@ -4467,10 +4467,10 @@ pub const Statx = extern struct {
 };
 
 fn makedev(major: u32, minor: u32) u64 {
-    var majorH = @as(u64, major >> 12);
-    var majorL = @as(u64, major & 0xfff);
-    var minorH = @as(u64, minor >> 8);
-    var minorL = @as(u64, minor & 0xff);
+    const majorH: u64 = @as(u64, major >> 12);
+    const majorL: u64 = @as(u64, major & 0xfff);
+    const minorH: u64 = @as(u64, minor >> 8);
+    const minorL: u64 = @as(u64, minor & 0xff);
     return (majorH << 44) | (minorH << 20) | (majorL << 8) | minorL;
 }
 
