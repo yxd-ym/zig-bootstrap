@@ -91,10 +91,10 @@ pub const Os = struct {
             }
         }
 
-        pub fn defaultVersionRange(tag: Tag, arch: Cpu.Arch) Os {
+        pub fn defaultVersionRange(tag: Tag) Os {
             return .{
                 .tag = tag,
-                .version_range = VersionRange.default(tag, arch),
+                .version_range = VersionRange.default(tag),
             };
         }
     };
@@ -238,7 +238,7 @@ pub const Os = struct {
 
         /// The default `VersionRange` represents the range that the Zig Standard Library
         /// bases its abstractions on.
-        pub fn default(tag: Tag, arch: Cpu.Arch) VersionRange {
+        pub fn default(tag: Tag) VersionRange {
             switch (tag) {
                 .freestanding,
                 .ananas,
