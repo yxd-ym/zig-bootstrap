@@ -296,12 +296,6 @@ pub const Os = struct {
                             .max = .{ .major = 14, .minor = 1, .patch = 0 },
                         },
                     },
-                    .loongarch64 => VersionRange{
-                        .semver = .{
-                            .min = .{ .major = 11, .minor = 7, .patch = 1 },
-                            .max = .{ .major = 14, .minor = 1, .patch = 0 },
-                        },
-                    },
                     else => unreachable,
                 },
                 .ios => return .{
