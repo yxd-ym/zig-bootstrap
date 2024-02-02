@@ -35,6 +35,7 @@ const targets = [_]std.Target.Query{
     .{ .cpu_arch = .csky, .os_tag = .freestanding, .abi = .none },
     .{ .cpu_arch = .csky, .os_tag = .linux, .abi = .none },
     .{ .cpu_arch = .hexagon, .os_tag = .linux, .abi = .none },
+    .{ .cpu_arch = .loongarch64, .os_tag = .linux, .abi = .gnu },
     .{ .cpu_arch = .m68k, .os_tag = .freestanding, .abi = .none },
     .{ .cpu_arch = .m68k, .os_tag = .linux, .abi = .none },
     .{ .cpu_arch = .mips, .os_tag = .linux, .abi = .gnueabihf },
