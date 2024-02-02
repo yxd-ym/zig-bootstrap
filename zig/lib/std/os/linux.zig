@@ -1481,7 +1481,7 @@ pub fn fstatat(dirfd: i32, path: [*:0]const u8, stat_buf: *Stat, flags: u32) usi
     } else if (@hasField(SYS, "fstatat")) {
         return syscall4(.fstatat, @as(usize, @bitCast(@as(isize, dirfd))), @intFromPtr(path), @intFromPtr(stat_buf), flags);
     } else if (@hasField(SYS, "statx")) {
-        const statx_buf: Statx = Statx{};
+        var statx_buf: Statx = undefined;
         const rc = syscall5(
             .statx,
             @as(usize, @bitCast(@as(isize, dirfd))),
