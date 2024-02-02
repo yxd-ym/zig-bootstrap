@@ -30,7 +30,7 @@ fn add(b: *std.Build, test_step: *std.Build.Step, optimize: std.builtin.Optimize
         .x86_64 => {
             exe.addCSourceFile(.{ .file = .{ .path = "a_x64.s" }, .flags = &[0][]const u8{} });
         },
-        else => return,
+        else => unreachable,
     }
     exe.linkLibC();
 
