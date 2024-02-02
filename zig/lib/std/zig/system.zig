@@ -87,6 +87,7 @@ pub fn getExternalExecutor(
             .armeb => Executor{ .qemu = "qemu-armeb" },
             .hexagon => Executor{ .qemu = "qemu-hexagon" },
             .x86 => Executor{ .qemu = "qemu-i386" },
+            .loongarch64 => Executor{ .qemu = "qemu-loongarch64" },
             .m68k => Executor{ .qemu = "qemu-m68k" },
             .mips => Executor{ .qemu = "qemu-mips" },
             .mipsel => Executor{ .qemu = "qemu-mipsel" },
