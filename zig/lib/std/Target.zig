@@ -283,20 +283,11 @@ pub const Os = struct {
                         .max = .{ .major = 14, .minor = 0, .patch = 0 },
                     },
                 },
-                .macos => return switch (arch) {
-                    .aarch64 => VersionRange{
-                        .semver = .{
-                            .min = .{ .major = 11, .minor = 7, .patch = 1 },
-                            .max = .{ .major = 14, .minor = 1, .patch = 0 },
-                        },
+                .macos => return .{
+                    .semver = .{
+                        .min = .{ .major = 11, .minor = 7, .patch = 1 },
+                        .max = .{ .major = 14, .minor = 1, .patch = 0 },
                     },
-                    .x86_64 => VersionRange{
-                        .semver = .{
-                            .min = .{ .major = 11, .minor = 7, .patch = 1 },
-                            .max = .{ .major = 14, .minor = 1, .patch = 0 },
-                        },
-                    },
-                    else => unreachable,
                 },
                 .ios => return .{
                     .semver = .{
