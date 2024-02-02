@@ -3,7 +3,7 @@ pub fn build(b: *Build) void {
     b.default_step = test_step;
 
     test_step.dependOn(@import("elf.zig").testAll(b));
-    // test_step.dependOn(@import("macho.zig").testAll(b));
+    test_step.dependOn(@import("macho.zig").testAll(b));
 }
 
 pub const Options = struct {
