@@ -1136,8 +1136,8 @@ pub const Cpu = struct {
                 .spu_2 => .Unknown,
                 .spirv32 => .Unknown,
                 .spirv64 => .Unknown,
-                .loongarch32 => .Unknown,
-                .loongarch64 => .Unknown,
+                .loongarch32 => .LOONGARCH32,
+                .loongarch64 => .LOONGARCH64,
             };
         }
 
