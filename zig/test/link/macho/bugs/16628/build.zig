@@ -23,7 +23,7 @@ fn add(b: *std.Build, test_step: *std.Build.Step, optimize: std.builtin.Optimize
         .target = target,
     });
     exe.addCSourceFile(.{ .file = .{ .path = "main.c" }, .flags = &[0][]const u8{} });
-    switch (target.cpu.arch) {
+    switch (target.result.cpu.arch) {
         .aarch64 => {
             exe.addCSourceFile(.{ .file = .{ .path = "a_arm64.s" }, .flags = &[0][]const u8{} });
         },
