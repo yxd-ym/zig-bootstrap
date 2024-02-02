@@ -1495,13 +1495,13 @@ pub fn fstatat(dirfd: i32, path: [*:0]const u8, stat_buf: *Stat, flags: u32) usi
         }
 
         // fill in stat_buf with statx_buf
-        stat_buf.dev = @as(dev_t, makedev(statx_buf.dev_major, statx_buf.dev_minor));
+        stat_buf.dev = makedev(statx_buf.dev_major, statx_buf.dev_minor);
         stat_buf.ino = @as(ino_t, statx_buf.ino);
         stat_buf.mode = @as(mode_t, statx_buf.mode);
         stat_buf.nlink = statx_buf.nlink;
         stat_buf.uid = statx_buf.uid;
         stat_buf.gid = statx_buf.gid;
-        stat_buf.rdev = @as(dev_t, makedev(statx_buf.rdev_major, statx_buf.rdev_minor));
+        stat_buf.rdev = makedev(statx_buf.rdev_major, statx_buf.rdev_minor);
         //
         stat_buf.size = @as(off_t, @bitCast(statx_buf.size));
         stat_buf.blksize = @as(blksize_t, @bitCast(statx_buf.blksize));
