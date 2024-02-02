@@ -4468,11 +4468,11 @@ pub const Statx = extern struct {
     __pad2: [14]u64,
 };
 
-fn makedev(major: u32, minor: u32) u64 {
-    const majorH: u64 = @as(u64, major >> 12);
-    const majorL: u64 = @as(u64, major & 0xfff);
-    const minorH: u64 = @as(u64, minor >> 8);
-    const minorL: u64 = @as(u64, minor & 0xff);
+fn makedev(major: u32, minor: u32) dev_t {
+    const majorH: dev_t = @as(dev_t, major >> 12);
+    const majorL: dev_t = @as(dev_t, major & 0xfff);
+    const minorH: dev_t = @as(dev_t, minor >> 8);
+    const minorL: dev_t = @as(dev_t, minor & 0xff);
     return (majorH << 44) | (minorH << 20) | (majorL << 8) | minorL;
 }
 
