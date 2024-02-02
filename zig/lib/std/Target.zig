@@ -296,7 +296,6 @@ pub const Os = struct {
                             .max = .{ .major = 14, .minor = 1, .patch = 0 },
                         },
                     },
-                    .loongarch64 => return .{ .none = {} },
                     else => unreachable,
                 },
                 .ios => return .{
