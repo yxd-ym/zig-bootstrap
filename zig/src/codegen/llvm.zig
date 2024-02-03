@@ -500,7 +500,6 @@ const DataLayoutBuilder = struct {
             .amdgcn,
             .bpfeb,
             .bpfel,
-            .loongarch64,
             .mips64,
             .mips64el,
             .powerpc64,
