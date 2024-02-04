@@ -566,9 +566,9 @@ fn clone() callconv(.Naked) void {
                 \\ ori     $a7, $zero, 220
                 \\ syscall 0               # call clone
                 \\
-                \\ beqz    $a0, child      # whether child process
+                \\ beqz    $a0, 1f         # whether child process
                 \\ jirl    $zero, $ra, 0   # parent process return
-                \\child:
+                \\1:
                 \\ ld.d    $t8, $sp, 0     # function pointer
                 \\ ld.d    $a0, $sp, 8     # argument pointer
                 \\ jirl    $ra, $t8, 0     # call the user's function
