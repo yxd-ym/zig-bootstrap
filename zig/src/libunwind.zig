@@ -102,7 +102,9 @@ pub fn buildStaticLib(comp: *Compilation, prog_node: *std.Progress.Node) !void {
         // This is intentionally always defined because the macro definition means, should it only
         // build for the target specified by compiler defines. Since we pass -target the compiler
         // defines will be correct.
-        try cflags.append("-D_LIBUNWIND_IS_NATIVE_ONLY");
+        if (target.cpu.arch != std.Target.Cpu.Arch.loongarch64) {
+            try cflags.append("-D_LIBUNWIND_IS_NATIVE_ONLY");
+        }
 
         if (comp.root_mod.optimize_mode == .Debug) {
             try cflags.append("-D_DEBUG");
