@@ -2538,13 +2538,18 @@ fn linkWithLLD(self: *Elf, arena: Allocator, prog_node: *std.Progress.Node) !voi
         // We will invoke ourselves as a child process to gain access to LLD.
         // This is necessary because LLD does not behave properly as a library -
         // it calls exit() and does not reset all global data between invocations.
-        const linker_command = "ld.lld";
+        const linker_command = switch (target.cpu.arch) {
+            std.Target.Cpu.Arch.loongarch64 => "mold",
+            else => "ld.lld",
+        };
         try argv.appendSlice(&[_][]const u8{ comp.self_exe_path.?, linker_command });
         if (is_obj) {
             try argv.append("-r");
         }
 
-        try argv.append("--error-limit=0");
+        if (!mem.eql(u8, linker_command, "mold")) {
+            try argv.append("--error-limit=0");
+        }
 
         if (comp.sysroot) |sysroot| {
             try argv.append(try std.fmt.allocPrint(arena, "--sysroot={s}", .{sysroot}));
