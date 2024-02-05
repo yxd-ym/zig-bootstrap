@@ -2951,9 +2951,9 @@ fn linkWithLLD(self: *Elf, arena: Allocator, prog_node: *std.Progress.Node) !voi
             // https://github.com/ziglang/zig/issues/3825
             var child: std.ChildProcess = undefined;
             if (mem.eql(u8, linker_command, "mold")) {
-                std.ChildProcess.init(argv.items[1..], arena);
+                child = std.ChildProcess.init(argv.items[1..], arena);
             } else {
-                std.ChildProcess.init(argv.items, arena);
+                child = std.ChildProcess.init(argv.items, arena);
             }
 
             if (comp.clang_passthrough_mode) {
