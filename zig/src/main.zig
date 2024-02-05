@@ -6160,7 +6160,7 @@ pub fn lldMain(
             child.stderr_behavior = .Inherit;
 
             const term = child.spawnAndWait() catch |err| {
-                break :rc false;
+                fatal("failed to launch mold: {s}", .{@errorName(err)});
             };
             switch (term) {
                 .Exited => |code| {
