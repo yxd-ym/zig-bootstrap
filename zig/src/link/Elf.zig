@@ -2951,7 +2951,22 @@ fn linkWithLLD(self: *Elf, arena: Allocator, prog_node: *std.Progress.Node) !voi
             // If possible, we run LLD as a child process because it does not always
             // behave properly as a library, unfortunately.
             // https://github.com/ziglang/zig/issues/3825
-            var child = std.ChildProcess.init(argv.items, arena);
+            var child: std.ChildProcess = undefined;
+            if (use_mold) {
+                if (std.Build.findProgram(.{"mold"}, .{})) |mold| {
+                    var args = std.ArrayList([]const u8).init(gpa);
+                    defer args.deinit();
+
+                    try args.append(mold);
+                    try args.appendSlice(argv.items[2..]);
+
+                    child = std.ChildProcess.init(args.items, arena);
+                } else |err| {
+                    log.err("unable to find mold: {s}", .{@errorName(err)});
+                }
+            } else {
+                child = std.ChildProcess.init(argv.items, arena);
+            }
 
             if (comp.clang_passthrough_mode or use_mold) {
                 child.stdin_behavior = .Inherit;
