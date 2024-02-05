@@ -6150,9 +6150,24 @@ pub fn lldMain(
         if (mem.eql(u8, args[1], "ld.lld")) {
             break :rc llvm.LinkELF(argc, argv.ptr, can_exit_early, false);
         } else if (mem.eql(u8, args[1], "mold")) {
-            // TODO
-            fatal("mold not implemented yet", .{});
-            unreachable;
+            if (!std.process.can_spawn) {
+                unreachable;
+            }
+
+            var child = std.ChildProcess.init(argv.items, arena);
+            child.stdin_behavior = .Inherit;
+            child.stdout_behavior = .Inherit;
+            child.stderr_behavior = .Inherit;
+
+            const term = child.spawnAndWait() catch |err| {
+                break :rc false;
+            };
+            switch (term) {
+                .Exited => |code| {
+                    break :rc false;
+                },
+                else => break :rc true,
+            }
         } else if (mem.eql(u8, args[1], "lld-link")) {
             break :rc llvm.LinkCOFF(argc, argv.ptr, can_exit_early, false);
         } else if (mem.eql(u8, args[1], "wasm-ld")) {
