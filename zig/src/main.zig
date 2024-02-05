@@ -296,7 +296,6 @@ pub fn mainArgs(gpa: Allocator, arena: Allocator, args: []const []const u8) !voi
     {
         return process.exit(try clangMain(arena, args));
     } else if (mem.eql(u8, cmd, "ld.lld") or
-        mem.eql(u8, cmd, "mold") or
         mem.eql(u8, cmd, "lld-link") or
         mem.eql(u8, cmd, "wasm-ld"))
     {
@@ -6114,7 +6113,6 @@ pub fn llvmArMain(alloc: Allocator, args: []const []const u8) error{OutOfMemory}
 
 /// The first argument determines which backend is invoked. The options are:
 /// * `ld.lld` - ELF
-/// * `mold` - FIXME ELF for loongarch64
 /// * `lld-link` - COFF
 /// * `wasm-ld` - WebAssembly
 pub fn lldMain(
@@ -6149,10 +6147,6 @@ pub fn lldMain(
         const argc = @as(c_int, @intCast(argv.len));
         if (mem.eql(u8, args[1], "ld.lld")) {
             break :rc llvm.LinkELF(argc, argv.ptr, can_exit_early, false);
-        } else if (mem.eql(u8, args[1], "mold")) {
-            // TODO
-            fatal("mold not implemented yet", .{});
-            unreachable;
         } else if (mem.eql(u8, args[1], "lld-link")) {
             break :rc llvm.LinkCOFF(argc, argv.ptr, can_exit_early, false);
         } else if (mem.eql(u8, args[1], "wasm-ld")) {
