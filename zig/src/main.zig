@@ -6164,9 +6164,9 @@ pub fn lldMain(
             };
             switch (term) {
                 .Exited => |code| {
-                    break :rc false;
+                    return code;
                 },
-                else => break :rc true,
+                else => break :rc false,
             }
         } else if (mem.eql(u8, args[1], "lld-link")) {
             break :rc llvm.LinkCOFF(argc, argv.ptr, can_exit_early, false);
