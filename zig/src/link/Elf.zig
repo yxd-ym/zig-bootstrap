@@ -2949,7 +2949,11 @@ fn linkWithLLD(self: *Elf, arena: Allocator, prog_node: *std.Progress.Node) !voi
             // If possible, we run LLD as a child process because it does not always
             // behave properly as a library, unfortunately.
             // https://github.com/ziglang/zig/issues/3825
-            var child = std.ChildProcess.init(argv.items, arena);
+            var child = if (mem.eql(u8, linker_command, "mold")) {
+                std.ChildProcess.init(argv.items[1..], arena);
+            } else {
+                std.ChildProcess.init(argv.items, arena);
+            };
             if (comp.clang_passthrough_mode) {
                 child.stdin_behavior = .Inherit;
                 child.stdout_behavior = .Inherit;
