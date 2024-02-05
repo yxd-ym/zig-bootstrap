@@ -6151,7 +6151,7 @@ pub fn lldMain(
             break :rc llvm.LinkELF(argc, argv.ptr, can_exit_early, false);
         } else if (mem.eql(u8, args[1], "mold")) {
             // TODO
-            fatal("mold not implemented yet");
+            fatal("mold not implemented yet", .{});
             unreachable;
         } else if (mem.eql(u8, args[1], "lld-link")) {
             break :rc llvm.LinkCOFF(argc, argv.ptr, can_exit_early, false);
