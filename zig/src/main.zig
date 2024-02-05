@@ -6154,7 +6154,7 @@ pub fn lldMain(
                 unreachable;
             }
 
-            var child = std.ChildProcess.init(argv.items, arena);
+            var child = std.ChildProcess.init(args[1..], arena);
             child.stdin_behavior = .Inherit;
             child.stdout_behavior = .Inherit;
             child.stderr_behavior = .Inherit;
