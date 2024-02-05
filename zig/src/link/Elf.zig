@@ -2542,12 +2542,14 @@ fn linkWithLLD(self: *Elf, arena: Allocator, prog_node: *std.Progress.Node) !voi
             std.Target.Cpu.Arch.loongarch64 => "mold",
             else => "ld.lld",
         };
+        const use_mold = mem.eql(u8, linker_command, "mold");
+
         try argv.appendSlice(&[_][]const u8{ comp.self_exe_path.?, linker_command });
         if (is_obj) {
             try argv.append("-r");
         }
 
-        if (!mem.eql(u8, linker_command, "mold")) {
+        if (!use_mold) {
             try argv.append("--error-limit=0");
         }
 
@@ -2950,13 +2952,13 @@ fn linkWithLLD(self: *Elf, arena: Allocator, prog_node: *std.Progress.Node) !voi
             // behave properly as a library, unfortunately.
             // https://github.com/ziglang/zig/issues/3825
             var child: std.ChildProcess = undefined;
-            if (mem.eql(u8, linker_command, "mold")) {
+            if (use_mold) {
                 child = std.ChildProcess.init(argv.items[1..], arena);
             } else {
                 child = std.ChildProcess.init(argv.items, arena);
             }
 
-            if (comp.clang_passthrough_mode) {
+            if (comp.clang_passthrough_mode || use_mold) {
                 child.stdin_behavior = .Inherit;
                 child.stdout_behavior = .Inherit;
                 child.stderr_behavior = .Inherit;
