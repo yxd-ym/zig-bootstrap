@@ -2958,7 +2958,7 @@ fn linkWithLLD(self: *Elf, arena: Allocator, prog_node: *std.Progress.Node) !voi
                 child = std.ChildProcess.init(argv.items, arena);
             }
 
-            if (comp.clang_passthrough_mode || use_mold) {
+            if (comp.clang_passthrough_mode or use_mold) {
                 child.stdin_behavior = .Inherit;
                 child.stdout_behavior = .Inherit;
                 child.stderr_behavior = .Inherit;
