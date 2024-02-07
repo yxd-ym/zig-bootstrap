@@ -345,7 +345,7 @@ pub fn detectNativeCpuAndFeatures() ?Target.Cpu {
             return PowerpcCpuinfoParser.parse(current_arch, f.reader()) catch null;
         },
         .loongarch64 => {
-            return current_arch.baseline();
+            return current_arch.generic().toCpu(current_arch); // FIXME use generic.
         },
         else => {},
     }
