@@ -196,7 +196,7 @@ const glibc_targets = [_]LibCTarget{
         .abi = MultiAbi{ .specific = Abi.gnu },
     },
     LibCTarget{
-        .name = "loongarch64-linux-gnu",
+        .name = "loongarch64-linux-gnu-lp64d",
         .arch = MultiArch{ .specific = Arch.loongarch64 },
         .abi = MultiAbi{ .specific = Abi.gnu },
     },
