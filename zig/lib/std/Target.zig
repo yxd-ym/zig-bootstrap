@@ -520,6 +520,10 @@ pub const Abi = enum {
         if (arch.isWasm()) {
             return .musl;
         }
+        if (arch.isLoongArch()) {
+            // FIXME: loongarch does not have musl support yet
+            return .gnu;
+        }
         switch (target_os.tag) {
             .freestanding,
             .ananas,
