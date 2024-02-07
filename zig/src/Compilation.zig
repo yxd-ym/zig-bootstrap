@@ -5366,6 +5366,12 @@ pub fn addCCArgs(
                         try argv.append("-msoft-float");
                     }
                 },
+                .loongarch64 => {
+                    if (target.cpu.model.llvm_name) |llvm_name| {
+                        try argv.append(try std.fmt.allocPrint(arena, "-march={s}", .{llvm_name}));
+                    }
+                    // TODO
+                },
                 else => {
                     // TODO
                 },
