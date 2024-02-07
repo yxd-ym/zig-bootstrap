@@ -5148,15 +5148,9 @@ pub fn addCCArgs(
             }
 
             if (target.cpu.model.llvm_name) |llvm_name| {
-                if (target.cpu.arch == Target.Cpu.Arch.loongarch64) {
-                    try argv.appendSlice(&[_][]const u8{
-                        "-Xclang", "-target-cpu", "-Xclang", "loongarch64",
-                    });
-                } else {
-                    try argv.appendSlice(&[_][]const u8{
-                        "-Xclang", "-target-cpu", "-Xclang", llvm_name,
-                    });
-                }
+                try argv.appendSlice(&[_][]const u8{
+                    "-Xclang", "-target-cpu", "-Xclang", llvm_name,
+                });
             }
 
             // It would be really nice if there was a more compact way to communicate this info to Clang.
