@@ -1383,6 +1383,7 @@ pub const Cpu = struct {
                 .x86 => &x86.cpu.pentium4,
                 .nvptx, .nvptx64 => &nvptx.cpu.sm_20,
                 .sparc, .sparcel => &sparc.cpu.v8,
+                .loongarch64 => &loongarch.cpu.loongarch64,
 
                 else => generic(arch),
             };
