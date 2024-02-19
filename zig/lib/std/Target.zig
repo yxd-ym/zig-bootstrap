@@ -338,7 +338,7 @@ pub const Os = struct {
                             .min = .{ .major = 4, .minor = 19, .patch = 0 },
                             .max = .{ .major = 6, .minor = 7, .patch = 5 },
                         },
-                        .glibc = .{ .major = 2, .minor = 28, .patch = 0 },
+                        .glibc = .{ .major = 2, .minor = 38, .patch = 0 },
                     },
                 },
 
