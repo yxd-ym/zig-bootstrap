@@ -488,6 +488,7 @@ set(ZIG_STAGE2_SOURCES
     "${CMAKE_SOURCE_DIR}/lib/std/Target/avr.zig"
     "${CMAKE_SOURCE_DIR}/lib/std/Target/bpf.zig"
     "${CMAKE_SOURCE_DIR}/lib/std/Target/hexagon.zig"
+    "${CMAKE_SOURCE_DIR}/lib/std/Target/loongarch.zig"
     "${CMAKE_SOURCE_DIR}/lib/std/Target/mips.zig"
     "${CMAKE_SOURCE_DIR}/lib/std/Target/msp430.zig"
     "${CMAKE_SOURCE_DIR}/lib/std/Target/nvptx.zig"
