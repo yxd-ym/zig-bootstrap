@@ -336,7 +336,7 @@ pub const Os = struct {
                     .linux = .{
                         .range = .{
                             .min = .{ .major = 4, .minor = 19, .patch = 0 },
-                            .max = .{ .major = 6, .minor = 5, .patch = 7 },
+                            .max = .{ .major = 6, .minor = 7, .patch = 5 },
                         },
                         .glibc = .{ .major = 2, .minor = 28, .patch = 0 },
                     },
