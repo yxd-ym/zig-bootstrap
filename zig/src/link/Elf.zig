@@ -2543,6 +2543,7 @@ fn linkWithLLD(self: *Elf, arena: Allocator, prog_node: *std.Progress.Node) !voi
             else => "ld.lld",
         };
         const use_ld_lld = mem.eql(u8, linker_command, "ld.lld");
+        const use_ld_bfd = mem.eql(u8, linker_command, "ld.bfd");
 
         try argv.appendSlice(&[_][]const u8{ comp.self_exe_path.?, linker_command });
         if (is_obj) {
@@ -2606,7 +2607,9 @@ fn linkWithLLD(self: *Elf, arena: Allocator, prog_node: *std.Progress.Node) !voi
             }
         }
 
-        try argv.append(try std.fmt.allocPrint(arena, "--image-base={d}", .{self.image_base}));
+        if (!use_ld_bfd) {
+            try argv.append(try std.fmt.allocPrint(arena, "--image-base={d}", .{self.image_base}));
+        }
 
         if (self.linker_script) |linker_script| {
             try argv.append("-T");
