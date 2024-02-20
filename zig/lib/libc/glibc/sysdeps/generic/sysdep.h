@@ -56,6 +56,13 @@
 # define cfi_personality(enc, exp)	.cfi_personality enc, exp
 # define cfi_lsda(enc, exp)		.cfi_lsda enc, exp
 
+/* .cfi_label is a gas extension not supported by clang.  */
+# ifndef __clang__
+#  define cfi_label(label)		.cfi_label label
+# else
+#  define cfi_label(label)
+# endif
+
 #else /* ! ASSEMBLER */
 
 # define CFI_STRINGIFY(Name) CFI_STRINGIFY2 (Name)
