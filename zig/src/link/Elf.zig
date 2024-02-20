@@ -2539,17 +2539,17 @@ fn linkWithLLD(self: *Elf, arena: Allocator, prog_node: *std.Progress.Node) !voi
         // This is necessary because LLD does not behave properly as a library -
         // it calls exit() and does not reset all global data between invocations.
         const linker_command = switch (target.cpu.arch) {
-            std.Target.Cpu.Arch.loongarch64 => "mold",
+            std.Target.Cpu.Arch.loongarch64 => "ld.bfd", // FIXME
             else => "ld.lld",
         };
-        const use_mold = mem.eql(u8, linker_command, "mold");
+        const use_ld_lld = mem.eql(u8, linker_command, "ld.lld");
 
         try argv.appendSlice(&[_][]const u8{ comp.self_exe_path.?, linker_command });
         if (is_obj) {
             try argv.append("-r");
         }
 
-        if (!use_mold) {
+        if (use_ld_lld) {
             try argv.append("--error-limit=0");
         }
 
@@ -2953,7 +2953,7 @@ fn linkWithLLD(self: *Elf, arena: Allocator, prog_node: *std.Progress.Node) !voi
             // https://github.com/ziglang/zig/issues/3825
             var child = std.ChildProcess.init(argv.items, arena);
 
-            if (comp.clang_passthrough_mode or use_mold) {
+            if (comp.clang_passthrough_mode or !use_ld_lld) {
                 child.stdin_behavior = .Inherit;
                 child.stdout_behavior = .Inherit;
                 child.stderr_behavior = .Inherit;
