@@ -2539,7 +2539,7 @@ fn linkWithLLD(self: *Elf, arena: Allocator, prog_node: *std.Progress.Node) !voi
         // This is necessary because LLD does not behave properly as a library -
         // it calls exit() and does not reset all global data between invocations.
         const linker_command = switch (target.cpu.arch) {
-            std.Target.Cpu.Arch.loongarch64 => "ld.lld", // FIXME
+            std.Target.Cpu.Arch.loongarch64 => "mold", // FIXME
             else => "ld.lld",
         };
         const use_ld_lld = mem.eql(u8, linker_command, "ld.lld");
