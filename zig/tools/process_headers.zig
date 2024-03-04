@@ -258,6 +258,11 @@ const musl_targets = [_]LibCTarget{
         .arch = MultiArch{ .specific = .m68k },
         .abi = MultiAbi{ .specific = .musl },
     },
+    LibCTarget{
+        .name = "loongarch64",
+        .arch = MultiArch{ .specific = .loongarch64 },
+        .abi = MultiAbi{ .specific = .musl },
+    },
 };
 
 const DestTarget = struct {
