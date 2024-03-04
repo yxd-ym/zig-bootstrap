@@ -2,7 +2,7 @@
 //! ./gen_stubs /path/to/musl/build-all >libc.S
 //!
 //! The directory 'build-all' is expected to contain these subdirectories:
-//! arm  x86  mips  mips64  powerpc  powerpc64  riscv64  x86_64
+//! arm  x86  mips  mips64  powerpc  powerpc64  riscv64  x86_64  loongarch64
 //!
 //! ...each with 'lib/libc.so' inside of them.
 //!
@@ -17,6 +17,7 @@
 //!   - `-DARCH_powerpc`
 //!   - `-DARCH_powerpc64`
 //!   - `-DARCH_aarch64`
+//!   - `-DARCH_loongarch64`
 
 // TODO: pick the best index to put them into instead of at the end
 //       - e.g. find a common previous symbol and put it after that one
@@ -38,6 +39,7 @@ const inputs = .{
     .powerpc,
     .powerpc64,
     .aarch64,
+    .loongarch64,
 };
 
 const arches: [inputs.len]std.Target.Cpu.Arch = blk: {
@@ -73,7 +75,8 @@ const MultiSym = struct {
             ms.present[archIndex(.x86_64)] == false and
             ms.present[archIndex(.powerpc)] == true and
             ms.present[archIndex(.powerpc64)] == false and
-            ms.present[archIndex(.aarch64)] == false;
+            ms.present[archIndex(.aarch64)] == false and
+            ms.present[archIndex(.loongarch64)] == false;
     }
 
     fn commonSize(ms: MultiSym) ?u64 {
@@ -116,6 +119,7 @@ const MultiSym = struct {
             .{ .powerpc, 4 },
             .{ .powerpc64, 8 },
             .{ .aarch64, 8 },
+            .{ .loongarch64, 8 },
         };
         inline for (map) |item| {
             const arch = item[0];
@@ -138,6 +142,7 @@ const MultiSym = struct {
             .{ .powerpc, 8 },
             .{ .powerpc64, 16 },
             .{ .aarch64, 16 },
+            .{ .loongarch64, 16 },
         };
         inline for (map) |item| {
             const arch = item[0];
@@ -160,6 +165,7 @@ const MultiSym = struct {
             .{ .powerpc, 1 },
             .{ .powerpc64, 2 },
             .{ .aarch64, 2 },
+            .{ .loongarch64, 2 },
         };
         inline for (map) |item| {
             const arch = item[0];
@@ -581,15 +587,16 @@ fn parseElf(parse: Parse, comptime is_64: bool, comptime endian: builtin.Endian)
 fn archIndex(arch: std.Target.Cpu.Arch) u8 {
     return switch (arch) {
         // zig fmt: off
-        .riscv64   => 0,
-        .mips      => 1,
-        .mips64    => 2,
-        .x86       => 3,
-        .x86_64    => 4,
-        .powerpc   => 5,
-        .powerpc64 => 6,
-        .aarch64   => 7,
-        else       => unreachable,
+        .riscv64     => 0,
+        .mips        => 1,
+        .mips64      => 2,
+        .x86         => 3,
+        .x86_64      => 4,
+        .powerpc     => 5,
+        .powerpc64   => 6,
+        .aarch64     => 7,
+        .loongarch64 => 8,
+        else         => unreachable,
         // zig fmt: on
     };
 }
@@ -597,15 +604,16 @@ fn archIndex(arch: std.Target.Cpu.Arch) u8 {
 fn archMuslName(arch: std.Target.Cpu.Arch) []const u8 {
     return switch (arch) {
         // zig fmt: off
-        .riscv64   => "riscv64",
-        .mips      => "mips",
-        .mips64    => "mips64",
-        .x86       => "i386",
-        .x86_64    => "x86_64",
-        .powerpc   => "powerpc",
-        .powerpc64 => "powerpc64",
-        .aarch64   => "aarch64",
-        else       => unreachable,
+        .riscv64     => "riscv64",
+        .mips        => "mips",
+        .mips64      => "mips64",
+        .x86         => "i386",
+        .x86_64      => "x86_64",
+        .powerpc     => "powerpc",
+        .powerpc64   => "powerpc64",
+        .aarch64     => "aarch64",
+        .loongarch64 => "loongarch64",
+        else         => unreachable,
         // zig fmt: on
     };
 }
