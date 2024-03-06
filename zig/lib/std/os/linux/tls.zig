@@ -48,8 +48,29 @@ const TLSVariant = enum {
 };
 
 const tls_variant = switch (native_arch) {
-    .arm, .armeb, .thumb, .aarch64, .aarch64_be, .riscv32, .riscv64, .mips, .mipsel, .mips64, .mips64el, .powerpc, .powerpcle, .powerpc64, .powerpc64le => TLSVariant.VariantI,
-    .x86_64, .x86, .sparc64 => TLSVariant.VariantII,
+    .arm,
+    .armeb,
+    .thumb,
+    .aarch64,
+    .aarch64_be,
+    .riscv32,
+    .riscv64,
+    .mips,
+    .mipsel,
+    .mips64,
+    .mips64el,
+    .powerpc,
+    .powerpcle,
+    .powerpc64,
+    .powerpc64le,
+    .loongarch64,
+    => TLSVariant.VariantI,
+
+    .x86_64,
+    .x86,
+    .sparc64,
+    => TLSVariant.VariantII,
+
     else => @compileError("undefined tls_variant for this architecture"),
 };
 
@@ -64,7 +85,17 @@ const tls_tcb_size = switch (native_arch) {
 
 // Controls if the TP points to the end of the TCB instead of its beginning
 const tls_tp_points_past_tcb = switch (native_arch) {
-    .riscv32, .riscv64, .mips, .mipsel, .mips64, .mips64el, .powerpc, .powerpc64, .powerpc64le => true,
+    .riscv32,
+    .riscv64,
+    .mips,
+    .mipsel,
+    .mips64,
+    .mips64el,
+    .powerpc,
+    .powerpc64,
+    .powerpc64le,
+    .loongarch64,
+    => true,
     else => false,
 };
 
@@ -179,6 +210,13 @@ pub fn setThreadPointer(addr: usize) void {
         .sparc64 => {
             asm volatile (
                 \\ mov %[addr], %%g7
+                :
+                : [addr] "r" (addr),
+            );
+        },
+        .loongarch64 => {
+            asm volatile (
+                \\ or $tp, $zero, %[addr]
                 :
                 : [addr] "r" (addr),
             );

@@ -344,6 +344,9 @@ pub fn detectNativeCpuAndFeatures() ?Target.Cpu {
         .powerpc, .powerpcle, .powerpc64, .powerpc64le => {
             return PowerpcCpuinfoParser.parse(current_arch, f.reader()) catch null;
         },
+        .loongarch64 => {
+            return std.Target.Cpu.baseline(current_arch);
+        },
         else => {},
     }
 

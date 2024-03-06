@@ -332,6 +332,12 @@ fn _start() callconv(.Naked) noreturn {
             \\ ba %[posixCallMainAndExit]
             \\  stx %%l0, %[argc_argv_ptr]
             ,
+            .loongarch64 =>
+            \\ or           $fp, $zero, $zero
+            \\ st.d         $sp, %[argc_argv_ptr]
+            \\ bstrins.d    $sp, $zero, 3, 0
+            \\ b %[posixCallMainAndExit]
+            ,
             else => @compileError("unsupported arch"),
         }
         : [argc_argv_ptr] "=m" (argc_argv_ptr),

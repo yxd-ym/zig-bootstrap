@@ -46,6 +46,8 @@ pub const available_libcs = [_]ArchOsAbi{
     .{ .arch = .x86, .os = .linux, .abi = .gnu },
     .{ .arch = .x86, .os = .linux, .abi = .musl },
     .{ .arch = .x86, .os = .windows, .abi = .gnu },
+    .{ .arch = .loongarch64, .os = .linux, .abi = .gnu, .glibc_min = .{ .major = 2, .minor = 36, .patch = 0 } },
+    .{ .arch = .loongarch64, .os = .linux, .abi = .musl },
     .{ .arch = .m68k, .os = .linux, .abi = .gnu },
     .{ .arch = .m68k, .os = .linux, .abi = .musl },
     .{ .arch = .mips64el, .os = .linux, .abi = .gnuabi64 },
@@ -145,6 +147,7 @@ pub fn osArchName(target: std.Target) [:0]const u8 {
         .linux => switch (target.cpu.arch) {
             .arm, .armeb, .thumb, .thumbeb => "arm",
             .aarch64, .aarch64_be, .aarch64_32 => "aarch64",
+            .loongarch32, .loongarch64 => "loongarch",
             .mips, .mipsel, .mips64, .mips64el => "mips",
             .powerpc, .powerpcle, .powerpc64, .powerpc64le => "powerpc",
             .riscv32, .riscv64 => "riscv",

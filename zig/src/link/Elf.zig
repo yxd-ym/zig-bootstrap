@@ -2538,13 +2538,21 @@ fn linkWithLLD(self: *Elf, arena: Allocator, prog_node: *std.Progress.Node) !voi
         // We will invoke ourselves as a child process to gain access to LLD.
         // This is necessary because LLD does not behave properly as a library -
         // it calls exit() and does not reset all global data between invocations.
-        const linker_command = "ld.lld";
+        const linker_command = switch (target.cpu.arch) {
+            std.Target.Cpu.Arch.loongarch64 => "mold", // FIXME
+            else => "ld.lld",
+        };
+        const use_ld_lld = mem.eql(u8, linker_command, "ld.lld");
+        const use_ld_bfd = mem.eql(u8, linker_command, "ld.bfd");
+
         try argv.appendSlice(&[_][]const u8{ comp.self_exe_path.?, linker_command });
         if (is_obj) {
             try argv.append("-r");
         }
 
-        try argv.append("--error-limit=0");
+        if (use_ld_lld) {
+            try argv.append("--error-limit=0");
+        }
 
         if (comp.sysroot) |sysroot| {
             try argv.append(try std.fmt.allocPrint(arena, "--sysroot={s}", .{sysroot}));
@@ -2599,7 +2607,9 @@ fn linkWithLLD(self: *Elf, arena: Allocator, prog_node: *std.Progress.Node) !voi
             }
         }
 
-        try argv.append(try std.fmt.allocPrint(arena, "--image-base={d}", .{self.image_base}));
+        if (!use_ld_bfd) {
+            try argv.append(try std.fmt.allocPrint(arena, "--image-base={d}", .{self.image_base}));
+        }
 
         if (self.linker_script) |linker_script| {
             try argv.append("-T");
@@ -2945,7 +2955,8 @@ fn linkWithLLD(self: *Elf, arena: Allocator, prog_node: *std.Progress.Node) !voi
             // behave properly as a library, unfortunately.
             // https://github.com/ziglang/zig/issues/3825
             var child = std.ChildProcess.init(argv.items, arena);
-            if (comp.clang_passthrough_mode) {
+
+            if (comp.clang_passthrough_mode or !use_ld_lld) {
                 child.stdin_behavior = .Inherit;
                 child.stdout_behavior = .Inherit;
                 child.stderr_behavior = .Inherit;
@@ -5445,6 +5456,8 @@ fn getLDMOption(target: std.Target) ?[]const u8 {
         .powerpc64le => return "elf64lppc",
         .sparc, .sparcel => return "elf32_sparc",
         .sparc64 => return "elf64_sparc",
+        .loongarch32 => return "elf32loongarch",
+        .loongarch64 => return "elf64loongarch",
         .mips => return "elf32btsmip",
         .mipsel => return "elf32ltsmip",
         .mips64 => {

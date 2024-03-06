@@ -444,6 +444,8 @@ fn start_asm_path(comp: *Compilation, arena: Allocator, basename: []const u8) ![
         } else {
             try result.appendSlice("powerpc" ++ s ++ "powerpc32");
         }
+    } else if (arch.isLoongArch()) {
+        try result.appendSlice("loongarch");
     }
 
     try result.appendSlice(s);
@@ -1163,7 +1165,7 @@ fn buildSharedLib(
 // Return true if glibc has crti/crtn sources for that architecture.
 pub fn needsCrtiCrtn(target: std.Target) bool {
     return switch (target.cpu.arch) {
-        .riscv32, .riscv64 => false,
+        .riscv32, .riscv64, .loongarch64 => false,
         else => true,
     };
 }

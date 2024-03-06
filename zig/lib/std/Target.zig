@@ -91,10 +91,10 @@ pub const Os = struct {
             }
         }
 
-        pub fn defaultVersionRange(tag: Tag, arch: Cpu.Arch) Os {
+        pub fn defaultVersionRange(tag: Tag) Os {
             return .{
                 .tag = tag,
-                .version_range = VersionRange.default(tag, arch),
+                .version_range = VersionRange.default(tag),
             };
         }
     };
@@ -238,7 +238,7 @@ pub const Os = struct {
 
         /// The default `VersionRange` represents the range that the Zig Standard Library
         /// bases its abstractions on.
-        pub fn default(tag: Tag, arch: Cpu.Arch) VersionRange {
+        pub fn default(tag: Tag) VersionRange {
             switch (tag) {
                 .freestanding,
                 .ananas,
@@ -283,20 +283,11 @@ pub const Os = struct {
                         .max = .{ .major = 14, .minor = 0, .patch = 0 },
                     },
                 },
-                .macos => return switch (arch) {
-                    .aarch64 => VersionRange{
-                        .semver = .{
-                            .min = .{ .major = 11, .minor = 7, .patch = 1 },
-                            .max = .{ .major = 14, .minor = 1, .patch = 0 },
-                        },
+                .macos => return .{
+                    .semver = .{
+                        .min = .{ .major = 11, .minor = 7, .patch = 1 },
+                        .max = .{ .major = 14, .minor = 1, .patch = 0 },
                     },
-                    .x86_64 => VersionRange{
-                        .semver = .{
-                            .min = .{ .major = 11, .minor = 7, .patch = 1 },
-                            .max = .{ .major = 14, .minor = 1, .patch = 0 },
-                        },
-                    },
-                    else => unreachable,
                 },
                 .ios => return .{
                     .semver = .{
@@ -345,9 +336,9 @@ pub const Os = struct {
                     .linux = .{
                         .range = .{
                             .min = .{ .major = 4, .minor = 19, .patch = 0 },
-                            .max = .{ .major = 6, .minor = 5, .patch = 7 },
+                            .max = .{ .major = 6, .minor = 7, .patch = 5 },
                         },
-                        .glibc = .{ .major = 2, .minor = 28, .patch = 0 },
+                        .glibc = .{ .major = 2, .minor = 38, .patch = 0 },
                     },
                 },
 
@@ -528,6 +519,10 @@ pub const Abi = enum {
     pub fn default(arch: Cpu.Arch, target_os: Os) Abi {
         if (arch.isWasm()) {
             return .musl;
+        }
+        if (arch.isLoongArch()) {
+            // FIXME: loongarch does not have musl support yet
+            return .gnu;
         }
         switch (target_os.tag) {
             .freestanding,
@@ -1002,6 +997,13 @@ pub const Cpu = struct {
             };
         }
 
+        pub inline fn isLoongArch(arch: Arch) bool {
+            return switch (arch) {
+                .loongarch32, .loongarch64 => true,
+                else => false,
+            };
+        }
+
         pub fn parseCpuModel(arch: Arch, cpu_name: []const u8) !*const Cpu.Model {
             for (arch.allCpuModels()) |cpu| {
                 if (std.mem.eql(u8, cpu_name, cpu.name)) {
@@ -1071,8 +1073,8 @@ pub const Cpu = struct {
                 .spu_2 => .SPU_2,
                 .spirv32 => .NONE,
                 .spirv64 => .NONE,
-                .loongarch32 => .NONE,
-                .loongarch64 => .NONE,
+                .loongarch32 => .LOONGARCH,
+                .loongarch64 => .LOONGARCH,
             };
         }
 
@@ -1136,8 +1138,8 @@ pub const Cpu = struct {
                 .spu_2 => .Unknown,
                 .spirv32 => .Unknown,
                 .spirv64 => .Unknown,
-                .loongarch32 => .Unknown,
-                .loongarch64 => .Unknown,
+                .loongarch32 => .LOONGARCH32,
+                .loongarch64 => .LOONGARCH64,
             };
         }
 
@@ -1381,6 +1383,7 @@ pub const Cpu = struct {
                 .x86 => &x86.cpu.pentium4,
                 .nvptx, .nvptx64 => &nvptx.cpu.sm_20,
                 .sparc, .sparcel => &sparc.cpu.v8,
+                .loongarch64 => &loongarch.cpu.loongarch64,
 
                 else => generic(arch),
             };
@@ -1673,6 +1676,8 @@ pub fn standardDynamicLinkerPath_cpu_os_abi(cpu: Cpu, os_tag: Os.Tag, abi: Abi) 
             .riscv32 => return copy(&result, "/lib/ld-linux-riscv32-ilp32.so.1"),
             .riscv64 => return copy(&result, "/lib/ld-linux-riscv64-lp64.so.1"),
 
+            .loongarch64 => return copy(&result, "/lib/ld-linux-loongarch-lp64d.so.1"),
+
             // Architectures in this list have been verified as not having a standard
             // dynamic linker path.
             .wasm32,
@@ -1715,7 +1720,6 @@ pub fn standardDynamicLinkerPath_cpu_os_abi(cpu: Cpu, os_tag: Os.Tag, abi: Abi) 
             .ve,
             .dxil,
             .loongarch32,
-            .loongarch64,
             .xtensa,
             => return result,
         },
@@ -2154,6 +2158,7 @@ pub fn c_type_bit_size(target: Target, c_type: CType) u16 {
                     .sparcel,
                     .wasm32,
                     .wasm64,
+                    .loongarch64,
                     => return 128,
 
                     else => return 64,
@@ -2266,6 +2271,7 @@ pub fn c_type_bit_size(target: Target, c_type: CType) u16 {
                     .sparcel,
                     .wasm32,
                     .wasm64,
+                    .loongarch64,
                     => return 128,
 
                     else => return 64,

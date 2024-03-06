@@ -17,6 +17,7 @@ pub const page_size = switch (builtin.cpu.arch) {
         else => 4 * 1024,
     },
     .sparc64 => 8 * 1024,
+    .loongarch64 => 16 * 1024,
     else => 4 * 1024,
 };
 

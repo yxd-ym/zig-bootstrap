@@ -43,6 +43,7 @@ const arch_bits = switch (native_arch) {
     .mips64, .mips64el => @import("linux/mips64.zig"),
     .powerpc, .powerpcle => @import("linux/powerpc.zig"),
     .powerpc64, .powerpc64le => @import("linux/powerpc64.zig"),
+    .loongarch64 => @import("linux/loongarch64.zig"),
     else => struct {},
 };
 pub const syscall0 = syscall_bits.syscall0;
@@ -106,6 +107,7 @@ pub const SYS = switch (@import("builtin").cpu.arch) {
     .mips64, .mips64el => syscalls.Mips64,
     .powerpc, .powerpcle => syscalls.PowerPC,
     .powerpc64, .powerpc64le => syscalls.PowerPC64,
+    .loongarch64 => syscalls.LoongArch64,
     else => @compileError("The Zig Standard Library is missing syscall definitions for the target CPU architecture"),
 };
 
@@ -1451,9 +1453,10 @@ pub fn accept4(fd: i32, noalias addr: ?*sockaddr, noalias len: ?*socklen_t, flag
 pub fn fstat(fd: i32, stat_buf: *Stat) usize {
     if (@hasField(SYS, "fstat64")) {
         return syscall2(.fstat64, @as(usize, @bitCast(@as(isize, fd))), @intFromPtr(stat_buf));
-    } else {
+    } else if (@hasField(SYS, "fstat")) {
         return syscall2(.fstat, @as(usize, @bitCast(@as(isize, fd))), @intFromPtr(stat_buf));
     }
+    return fstatat(fd, "", stat_buf, AT.EMPTY_PATH);
 }
 
 pub fn stat(pathname: [*:0]const u8, statbuf: *Stat) usize {
@@ -1475,9 +1478,41 @@ pub fn lstat(pathname: [*:0]const u8, statbuf: *Stat) usize {
 pub fn fstatat(dirfd: i32, path: [*:0]const u8, stat_buf: *Stat, flags: u32) usize {
     if (@hasField(SYS, "fstatat64")) {
         return syscall4(.fstatat64, @as(usize, @bitCast(@as(isize, dirfd))), @intFromPtr(path), @intFromPtr(stat_buf), flags);
-    } else {
+    } else if (@hasField(SYS, "fstatat")) {
         return syscall4(.fstatat, @as(usize, @bitCast(@as(isize, dirfd))), @intFromPtr(path), @intFromPtr(stat_buf), flags);
+    } else if (@hasField(SYS, "statx")) {
+        var statx_buf: Statx = undefined;
+        const rc = syscall5(
+            .statx,
+            @as(usize, @bitCast(@as(isize, dirfd))),
+            @intFromPtr(path),
+            AT.NO_AUTOMOUNT | flags,
+            STATX_BASIC_STATS,
+            @intFromPtr(&statx_buf),
+        );
+        if (rc != 0) {
+            return rc;
+        }
+
+        // fill in stat_buf with statx_buf
+        stat_buf.dev = makedev(statx_buf.dev_major, statx_buf.dev_minor);
+        stat_buf.ino = @as(ino_t, statx_buf.ino);
+        stat_buf.mode = @as(mode_t, statx_buf.mode);
+        stat_buf.nlink = statx_buf.nlink;
+        stat_buf.uid = statx_buf.uid;
+        stat_buf.gid = statx_buf.gid;
+        stat_buf.rdev = makedev(statx_buf.rdev_major, statx_buf.rdev_minor);
+        //
+        stat_buf.size = @as(off_t, @bitCast(statx_buf.size));
+        stat_buf.blksize = @as(blksize_t, @bitCast(statx_buf.blksize));
+        stat_buf.blocks = @as(blkcnt_t, @bitCast(statx_buf.blocks));
+        stat_buf.atim = timespecFrom(statx_buf.atime);
+        stat_buf.mtim = timespecFrom(statx_buf.mtime);
+        stat_buf.ctim = timespecFrom(statx_buf.ctime);
+
+        return 0;
     }
+    return @as(usize, @bitCast(-@as(isize, @intFromEnum(E.NOSYS))));
 }
 
 pub fn statx(dirfd: i32, path: [*]const u8, flags: u32, mask: u32, statx_buf: *Statx) usize {
@@ -3658,12 +3693,13 @@ pub fn CPU_COUNT(set: cpu_set_t) cpu_count_t {
 
 pub const MINSIGSTKSZ = switch (native_arch) {
     .x86, .x86_64, .arm, .mipsel => 2048,
+    .loongarch64 => 4096,
     .aarch64 => 5120,
     else => @compileError("MINSIGSTKSZ not defined for this architecture"),
 };
 pub const SIGSTKSZ = switch (native_arch) {
     .x86, .x86_64, .arm, .mipsel => 8192,
-    .aarch64 => 16384,
+    .aarch64, .loongarch64 => 16384,
     else => @compileError("SIGSTKSZ not defined for this architecture"),
 };
 
@@ -4431,6 +4467,21 @@ pub const Statx = extern struct {
 
     __pad2: [14]u64,
 };
+
+fn makedev(major: u32, minor: u32) dev_t {
+    const majorH: dev_t = @as(dev_t, major >> 12);
+    const majorL: dev_t = @as(dev_t, major & 0xfff);
+    const minorH: dev_t = @as(dev_t, minor >> 8);
+    const minorL: dev_t = @as(dev_t, minor & 0xff);
+    return (majorH << 44) | (minorH << 20) | (majorL << 8) | minorL;
+}
+
+fn timespecFrom(ts: statx_timestamp) timespec {
+    return timespec{
+        .tv_sec = @as(isize, @bitCast(ts.tv_sec)),
+        .tv_nsec = @as(isize, ts.tv_nsec),
+    };
+}
 
 pub const addrinfo = extern struct {
     flags: i32,
@@ -6006,6 +6057,7 @@ pub const AUDIT = struct {
             .arm, .thumb => .ARM,
             .riscv64 => .RISCV64,
             .sparc64 => .SPARC64,
+            .loongarch64 => .LOONGARCH64,
             .mips => .MIPS,
             .mipsel => .MIPSEL,
             .powerpc => .PPC,
@@ -6020,6 +6072,7 @@ pub const AUDIT = struct {
         CSKY = toAudit(.csky),
         HEXAGON = @intFromEnum(std.elf.EM.HEXAGON),
         X86 = toAudit(.x86),
+        LOONGARCH64 = toAudit(.loongarch64),
         M68K = toAudit(.m68k),
         MIPS = toAudit(.mips),
         MIPSEL = toAudit(.mips) | LE,
@@ -6047,6 +6100,7 @@ pub const AUDIT = struct {
                 .riscv64,
                 .sparc64,
                 .x86_64,
+                .loongarch64,
                 => res |= @"64BIT",
                 else => {},
             }

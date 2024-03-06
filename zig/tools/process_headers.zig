@@ -195,6 +195,11 @@ const glibc_targets = [_]LibCTarget{
         .arch = MultiArch{ .specific = Arch.m68k },
         .abi = MultiAbi{ .specific = Abi.gnu },
     },
+    LibCTarget{
+        .name = "loongarch64-linux-gnu-lp64d",
+        .arch = MultiArch{ .specific = Arch.loongarch64 },
+        .abi = MultiAbi{ .specific = Abi.gnu },
+    },
 };
 
 const musl_targets = [_]LibCTarget{
@@ -251,6 +256,11 @@ const musl_targets = [_]LibCTarget{
     LibCTarget{
         .name = "m68k",
         .arch = MultiArch{ .specific = .m68k },
+        .abi = MultiAbi{ .specific = .musl },
+    },
+    LibCTarget{
+        .name = "loongarch64",
+        .arch = MultiArch{ .specific = .loongarch64 },
         .abi = MultiAbi{ .specific = .musl },
     },
 };

@@ -5366,6 +5366,12 @@ pub fn addCCArgs(
                         try argv.append("-msoft-float");
                     }
                 },
+                .loongarch64 => {
+                    if (target.cpu.model.llvm_name) |llvm_name| {
+                        try argv.append(try std.fmt.allocPrint(arena, "-march={s}", .{llvm_name}));
+                    }
+                    // TODO
+                },
                 else => {
                     // TODO
                 },
@@ -6153,14 +6159,17 @@ pub fn lockAndSetMiscFailure(
     return setMiscFailure(comp, tag, format, args);
 }
 
-fn parseLldStderr(comp: *Compilation, comptime prefix: []const u8, stderr: []const u8) Allocator.Error!void {
+fn parseLldStderr(comp: *Compilation, prefix: []const u8, stderr: []const u8) Allocator.Error!void {
     var context_lines = std.ArrayList([]const u8).init(comp.gpa);
     defer context_lines.deinit();
+
+    const prefix_with_colon = try std.fmt.allocPrint(comp.gpa, "{s}:", .{prefix});
+    defer comp.gpa.free(prefix_with_colon);
 
     var current_err: ?*LldError = null;
     var lines = mem.splitSequence(u8, stderr, if (builtin.os.tag == .windows) "\r\n" else "\n");
     while (lines.next()) |line| {
-        if (mem.startsWith(u8, line, prefix ++ ":")) {
+        if (mem.startsWith(u8, line, prefix_with_colon)) {
             if (current_err) |err| {
                 err.context_lines = try context_lines.toOwnedSlice();
             }
@@ -6192,7 +6201,7 @@ fn parseLldStderr(comp: *Compilation, comptime prefix: []const u8, stderr: []con
     }
 }
 
-pub fn lockAndParseLldStderr(comp: *Compilation, comptime prefix: []const u8, stderr: []const u8) void {
+pub fn lockAndParseLldStderr(comp: *Compilation, prefix: []const u8, stderr: []const u8) void {
     comp.mutex.lock();
     defer comp.mutex.unlock();
 

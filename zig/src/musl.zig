@@ -336,6 +336,7 @@ fn isMuslArchName(name: []const u8) bool {
         "arm",
         "generic",
         "i386",
+        "loongarch64",
         "m68k",
         "microblaze",
         "mips",

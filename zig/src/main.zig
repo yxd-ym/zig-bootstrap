@@ -296,6 +296,8 @@ pub fn mainArgs(gpa: Allocator, arena: Allocator, args: []const []const u8) !voi
     {
         return process.exit(try clangMain(arena, args));
     } else if (mem.eql(u8, cmd, "ld.lld") or
+        mem.eql(u8, cmd, "ld.bfd") or
+        mem.eql(u8, cmd, "mold") or
         mem.eql(u8, cmd, "lld-link") or
         mem.eql(u8, cmd, "wasm-ld"))
     {
@@ -6113,6 +6115,8 @@ pub fn llvmArMain(alloc: Allocator, args: []const []const u8) error{OutOfMemory}
 
 /// The first argument determines which backend is invoked. The options are:
 /// * `ld.lld` - ELF
+/// * `ld.bfd` - FIXME ELF for loongarch64
+/// * `mold` - FIXME ELF for loongarch64
 /// * `lld-link` - COFF
 /// * `wasm-ld` - WebAssembly
 pub fn lldMain(
@@ -6147,6 +6151,25 @@ pub fn lldMain(
         const argc = @as(c_int, @intCast(argv.len));
         if (mem.eql(u8, args[1], "ld.lld")) {
             break :rc llvm.LinkELF(argc, argv.ptr, can_exit_early, false);
+        } else if (mem.eql(u8, args[1], "mold") or mem.eql(u8, args[1], "ld.bfd")) {
+            if (!std.process.can_spawn) {
+                unreachable;
+            }
+
+            var child = std.ChildProcess.init(args[1..], arena);
+            child.stdin_behavior = .Inherit;
+            child.stdout_behavior = .Inherit;
+            child.stderr_behavior = .Inherit;
+
+            const term = child.spawnAndWait() catch |err| {
+                fatal("failed to launch {s}: {s}", .{args[1], @errorName(err)});
+            };
+            switch (term) {
+                .Exited => |code| {
+                    return code;
+                },
+                else => break :rc false,
+            }
         } else if (mem.eql(u8, args[1], "lld-link")) {
             break :rc llvm.LinkCOFF(argc, argv.ptr, can_exit_early, false);
         } else if (mem.eql(u8, args[1], "wasm-ld")) {
