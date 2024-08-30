@@ -11799,6 +11799,7 @@ fn backendSupportsF16(target: std.Target) bool {
         .mips64,
         .mips64el,
         .s390x,
+        .loongarch64,
         => false,
         .aarch64,
         .aarch64_be,
