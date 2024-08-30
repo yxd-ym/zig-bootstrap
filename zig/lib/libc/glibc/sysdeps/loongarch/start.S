@@ -56,7 +56,7 @@ ENTRY (ENTRY_POINT)
 
 /* Terminate call stack by noting ra is undefined.  Use a dummy
    .cfi_label to force starting the FDE.  */
-	.cfi_label .Ldummy
+	/* .cfi_label .Ldummy */
 	cfi_undefined (1)
 	or		a5, a0, zero /* rtld_fini */
 
